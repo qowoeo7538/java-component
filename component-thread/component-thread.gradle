@@ -1,0 +1,7 @@
+description = "Component Thread"
+
+dependencies {
+    compile(project(":component-common"))
+    compile("org.springframework:spring-core")
+    compile("org.springframework:spring-context")
+}
