@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
  * @create: 2018-03-18
  * @description:
  */
-public abstract class ClassHelper {
+public abstract class ClassExtensionUtils {
     /**
      * 通过 name 转成 URI
      *

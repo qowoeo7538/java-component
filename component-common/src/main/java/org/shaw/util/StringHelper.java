@@ -1,13 +1,14 @@
 package org.shaw.util;
 
 import org.shaw.io.UnsafeStringWriter;
+import org.springframework.util.StringUtils;
 
 import java.io.PrintWriter;
 
 /**
  * String 工具类
  */
-public abstract class StringUtils extends org.springframework.util.StringUtils {
+public abstract class StringHelper extends StringUtils {
     /**
      * 异常打印
      *

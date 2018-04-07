@@ -1,7 +1,7 @@
 package org.shaw.core.extension.entity;
 
-import org.shaw.common.Constants;
-import org.shaw.util.CollectionUtils;
+import org.shaw.core.Constants;
+import org.shaw.util.CollectionHelper;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public final class URL implements Serializable {
     }
 
     public URL(String protocol, String host, int port, String[] pairs) { // varargs ... confilict with the following path argument, use array instead.
-        this(protocol, null, null, host, port, null, CollectionUtils.toStringMap(pairs));
+        this(protocol, null, null, host, port, null, CollectionHelper.toStringMap(pairs));
     }
 
     public URL(String protocol, String host, int port, Map<String, String> parameters) {
@@ -55,7 +55,7 @@ public final class URL implements Serializable {
     }
 
     public URL(String protocol, String host, int port, String path, String... pairs) {
-        this(protocol, null, null, host, port, path, CollectionUtils.toStringMap(pairs));
+        this(protocol, null, null, host, port, path, CollectionHelper.toStringMap(pairs));
     }
 
     public URL(String protocol, String host, int port, String path, Map<String, String> parameters) {
@@ -67,7 +67,7 @@ public final class URL implements Serializable {
     }
 
     public URL(String protocol, String username, String password, String host, int port, String path, String... pairs) {
-        this(protocol, username, password, host, port, path, CollectionUtils.toStringMap(pairs));
+        this(protocol, username, password, host, port, path, CollectionHelper.toStringMap(pairs));
     }
 
     public URL(String protocol, String username, String password, String host, int port, String path, Map<String, String> parameters) {

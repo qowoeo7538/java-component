@@ -1,5 +1,6 @@
 package org.shaw.core.extension.adaptive.impl;
 
+import org.shaw.core.extension.ExtensionLoader;
 import org.shaw.core.extension.adaptive.HasAdaptiveExt;
 import org.shaw.core.extension.entity.URL;
 
