@@ -1,0 +1,2 @@
+adaptive=org.shaw.core.extension.factory.AdaptiveExtensionFactory
+spi=org.shaw.core.extension.factory.SpiExtensionFactory

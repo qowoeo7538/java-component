@@ -19,9 +19,7 @@ buildScan {
 }
 
 ext {
-    moduleProjects = subprojects.findAll{
-
-    }
+    moduleProjects = subprojects
 }
 
 // 所有项目配置
