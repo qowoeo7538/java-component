@@ -3,6 +3,7 @@ package org.shaw.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.management.*;
+import java.nio.charset.Charset;
 
 /**
  * JVM运行时跟踪工具

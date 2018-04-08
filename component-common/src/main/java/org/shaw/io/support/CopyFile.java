@@ -28,12 +28,12 @@ public class CopyFile {
     private int count;
 
     public CopyFile(String srcName, String copyName, int count) {
+        this.srcName = srcName;
         try {
             this.fileSize = StreamHelper.getFileSize(CopyFile.this.srcName);
         } catch (Exception e) {
             throw ExceptionUtils.unchecked(e);
         }
-        this.srcName = srcName;
         this.copyName = copyName;
         this.count = count;
     }
@@ -97,9 +97,11 @@ public class CopyFile {
                 } else {
                     bytes = new byte[(int) this.fileSize % this.count];
                 }
-                randomAccessFileRead.read(bytes, 0, bytes.length);
-                randomAccessFileWrite.seek((this.block - 1) * this.writeSize);
-                randomAccessFileWrite.write(bytes);
+                int length = randomAccessFileRead.read(bytes, 0, bytes.length);
+                if (length > 0) {
+                    randomAccessFileWrite.seek((this.block - 1) * this.writeSize);
+                    randomAccessFileWrite.write(bytes);
+                }
             } catch (Exception e) {
                 throw ExceptionUtils.unchecked(e);
             }
