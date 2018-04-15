@@ -1,5 +1,7 @@
 description = "Component Common"
 
+artifactId = 'component-common'
+
 dependencies {
     compile("org.springframework:spring-core")
     compile("org.springframework:spring-context")

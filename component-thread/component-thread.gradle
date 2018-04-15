@@ -1,5 +1,7 @@
 description = "Component Thread"
 
+artifactId = 'component-thread'
+
 dependencies {
     compile(project(":component-common"))
     compile("org.springframework:spring-core")

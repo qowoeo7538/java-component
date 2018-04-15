@@ -20,15 +20,19 @@ buildScan {
 
 ext {
     moduleProjects = subprojects
+    localRepository = 'D:\\m2\\repository'
 }
 
 // 所有项目配置
 configure(allprojects) { project ->
-    group = "org.shaw"
-    version = '1.0-SNAPSHOT'
 
     apply plugin: "propdeps"
     apply plugin: "java"
+
+    group = "org.shaw"
+    version = '1.0-SNAPSHOT'
+
+
 
     repositories {
         mavenCentral()
@@ -39,10 +43,26 @@ configure(allprojects) { project ->
 // 模块项目
 configure(moduleProjects) { subproject ->
 
+    apply plugin: 'maven'
     apply plugin: "io.spring.dependency-management"
+
+    // 定义本地maven仓库的地址, 执行:gradle clean uploadArchives 发布到本地仓库
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: uri(localRepository))
+                // 组名
+                pom.groupId = 'org.shaw'
+                // 版本号
+                pom.version = '1.0-SNAPSHOT'
+            }
+        }
+    }
 
     // 属性配置
     ext {
+        artifactId = uploadArchives.repositories.mavenDeployer.pom.artifactId
+
         junitVersion = "4.12"
         mockitoVersion = "2.12.0"
         hamcrestVersion = "1.3"
