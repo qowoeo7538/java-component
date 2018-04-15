@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
- * {@code BlockingQueue} 存取锁，会导致性能底下，
+ * {@code BlockingQueue} 存取锁，会导致性能低下，
  * 通过 {@code LinkedTransferQueue} 预占模式，保证更好的性能
  */
 public class ExecutorQueue extends LinkedTransferQueue<Runnable> {
