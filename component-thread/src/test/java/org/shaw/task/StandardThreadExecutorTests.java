@@ -6,7 +6,7 @@ import org.junit.Test;
  * @create: 2017-12-26
  * @description:
  */
-public class StandardThreadExecutorTest {
+public class StandardThreadExecutorTests {
 
     public static void main(String[] args) {
         StandardThreadExecutor standardThreadExecutor = new StandardThreadExecutor();
