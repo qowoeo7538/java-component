@@ -91,7 +91,7 @@ public abstract class StreamHelper extends StreamUtils {
         if (!file.isFile()) {
             return null;
         }
-        MessageDigest digest = null;
+        MessageDigest digest;
         byte buffer[] = new byte[8192];
         int len;
         try (FileInputStream in = new FileInputStream(file)) {
@@ -119,7 +119,7 @@ public abstract class StreamHelper extends StreamUtils {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             BASE64Encoder base64 = new BASE64Encoder();
             byte[] buf = new byte[10 * 1024];
-            int readLenth = 0;
+            int readLenth;
             while ((readLenth = fileInputStream.read(buf)) != -1) {
                 byte[] copyByte = new byte[readLenth - 1];
                 for (int i = 0; i < copyByte.length; i++) {

@@ -3,6 +3,10 @@ rootProject.name = 'java-component'
 include 'component-common'
 include 'component-thread'
 
+include 'buildScript'
+rootProject.children.find{ it.name == "buildScript" }.name = "component-build-script"
+
+
 rootProject.children.each {project ->
     project.buildFileName = "${project.name}.gradle"
 }
