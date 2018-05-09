@@ -4,6 +4,7 @@ rebel.xml
 # 特定目录
 target/
 classes/
+/buildScript/reports/
 
 # Eclipse artifacts, including WTP generated manifests
 .classpath

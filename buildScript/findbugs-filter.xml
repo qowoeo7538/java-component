@@ -15,12 +15,5 @@
   ~ limitations under the License.
   -->
 <FindBugsFilter>
-    <Match>
-        <Confidence value="2" />
-        <Rank value="15" />
-        <Bug category="SECURITY,PERFORMANCE,MALICIOUS_CODE" />
-        <Not>
-            <Bug pattern="UEC_USE_ENUM_COLLECTIONS,DLC_DUBIOUS_LIST_COLLECTION,PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS,EI_EXPOSE_REP,EI_EXPOSE_REP2" />
-        </Not>
-    </Match>
+
 </FindBugsFilter>
