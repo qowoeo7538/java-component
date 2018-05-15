@@ -1,5 +1,6 @@
 package org.shaw.core.extension.factory;
 
+import org.shaw.core.extension.Adaptive;
 import org.shaw.core.extension.ExtensionFactory;
 import org.shaw.core.extension.ExtensionLoader;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @create: 2018-03-06
  * @description:
  */
+@Adaptive
 public class AdaptiveExtensionFactory implements ExtensionFactory {
 
     private final List<ExtensionFactory> factories;

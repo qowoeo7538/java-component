@@ -1,12 +1,14 @@
 package org.shaw.compiler.support;
 
 import org.shaw.compiler.Compiler;
+import org.shaw.core.extension.Adaptive;
 import org.shaw.core.extension.ExtensionLoader;
 
 /**
  * @create: 2018-03-15
  * @description:
  */
+@Adaptive
 public class AdaptiveCompiler implements Compiler {
 
     /** 每次需要该参数时,都需要从主内存读取,保证可见性 */

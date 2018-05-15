@@ -13,8 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @create: 2018-03-01
- * @description:
+ * SPI 测试
  */
 public class ExtensionLoaderAdaptiveTests {
     @Test
