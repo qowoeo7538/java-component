@@ -25,11 +25,13 @@ public class ExtensionLoaderAdaptiveTests {
 
     @Test
     public void testGetAdaptiveExtensionDefaultAdaptiveKey() {
-        SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
-        Map<String, String> map = new HashMap<>();
+        {
+            SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
+            Map<String, String> map = new HashMap<>();
 
-        URL url = new URL("p1", "1.2.3.4", 1010, "path1", map);
-        String echo = ext.echo(url, "haha");
-        assertEquals("Ext1Impl1-echo", echo);
+            URL url = new URL("p1", "1.2.3.4", 1010, "path1", map);
+            String echo = ext.echo(url, "haha");
+            assertEquals("Ext1Impl1-echo", echo);
+        }
     }
 }

@@ -34,7 +34,7 @@ public class ExtensionLoader<T> {
     private static final String SERVICES_DIRECTORY = "META-INF/services/";
 
     /** 自定义 SPI 目录 */
-    private static final String DIRECTORY = "META-INF/example/";
+    private static final String DIRECTORY = "META-INF/component/";
 
     /** 自定义 SPI 目录 */
     private static final String INTERNAL_DIRECTORY = DIRECTORY + "internal/";
@@ -90,7 +90,7 @@ public class ExtensionLoader<T> {
      */
     private ExtensionLoader(Class<?> type) {
         this.type = type;
-        // 创建 SPI 的工厂类,忽略掉本身就是工厂的 ExtensionFactory 类
+        // 创建对象的 SPI 工厂类,忽略掉本身就是工厂的 ExtensionFactory 类
         objectFactory = (type == ExtensionFactory.class ? null :
                 ExtensionLoader
                         // 获取 ExtensionFactory 的 ExtensionLoader 对象
@@ -129,11 +129,11 @@ public class ExtensionLoader<T> {
      * 如果为 {@code null}, 再构造该 Class 的 {@code ExtensionLoader} 放入 {@link #EXTENSION_LOADERS}
      *
      * @param type 类类型对象
-     * @see #withExtensionAnnotation(Class)
+     * @return {@code ExtensionLoader<T>}
      */
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
         if (type == null) {
-            throw new IllegalArgumentException("type 不能为 null!");
+            throw new IllegalArgumentException("参数[type]不能为null!");
         }
         if (!type.isInterface()) {
             throw new IllegalArgumentException(type + " 不是一个接口类!");
