@@ -29,7 +29,7 @@ public abstract class AbstractCompiler implements Compiler {
      * @return Class
      */
     @Override
-    public Class<?> compile(String code, ClassLoader classLoader) {
+    public Class<?> compile(String code, final ClassLoader classLoader) {
         code = code.trim();
         /**
          * 判断 code 中是否包含 package、class 关键字。
