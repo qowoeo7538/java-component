@@ -5,4 +5,5 @@ artifactId = 'component-common'
 dependencies {
     compile("org.springframework:spring-core")
     compile("org.springframework:spring-context")
+    compile("org.javassist:javassist:${javassistVersion}")
 }

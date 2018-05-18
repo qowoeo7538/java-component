@@ -75,7 +75,7 @@ public class ExtensionLoader<T> {
 
     private Set<Class<?>> cachedWrapperClasses;
 
-    /** SPI 接口扩展名(注解的 value 信息) */
+    /** 默认实现类的别名 (SPI接口注解的 value 信息设置) */
     private String cachedDefaultName;
 
     /**
@@ -173,6 +173,9 @@ public class ExtensionLoader<T> {
         return (T) instance;
     }
 
+    /**
+     * @return 获取默认的 SPI 实现对象
+     */
     public T getDefaultExtension() {
         getExtensionClasses();
         if (null == cachedDefaultName || cachedDefaultName.length() == 0 || Constants.TRUE.equals(cachedDefaultName)) {
@@ -225,10 +228,10 @@ public class ExtensionLoader<T> {
                 return entry.getValue();
             }
         }
-
         StringBuilder buf = new StringBuilder("No such extension " + type.getName() + " by name " + name);
         int i = 1;
-        for (Map.Entry<String, IllegalStateException> entry : exceptions.entrySet()) {
+        for (Iterator<Map.Entry<String, IllegalStateException>> iterator = exceptions.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, IllegalStateException> entry = iterator.next();
             if (i == 1) {
                 buf.append(", possible causes: ");
             }

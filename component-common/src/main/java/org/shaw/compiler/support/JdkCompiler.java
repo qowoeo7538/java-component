@@ -1,23 +1,39 @@
 package org.shaw.compiler.support;
 
 import org.shaw.util.ClassHelper;
+import org.shaw.util.ResourceHelper;
 
-import javax.tools.*;
-import java.io.*;
+import javax.tools.DiagnosticCollector;
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  */
 public class JdkCompiler extends AbstractCompiler {
-
-    /** 默认类加载器类名 */
-    private final static String APP_CLASSLOADER = "sun.misc.Launcher$AppClassLoader";
 
     /** 类加载器 */
     private final ClassLoaderImpl classLoader;
@@ -52,7 +68,7 @@ public class JdkCompiler extends AbstractCompiler {
          * 2) 不是默认的类加载器
          */
         if (loader instanceof URLClassLoader
-                && (!APP_CLASSLOADER.equals(loader.getClass().getName()))) {
+                && (!ClassHelper.APP_CLASSLOADER.equals(loader.getClass().getName()))) {
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<>();
@@ -175,12 +191,12 @@ public class JdkCompiler extends AbstractCompiler {
         private ByteArrayOutputStream bytecode;
 
         JavaFileObjectImpl(final String name, final Kind kind) {
-            super(ClassExtensionUtils.toURI(name), kind);
+            super(ResourceHelper.toURI(name), kind);
             source = null;
         }
 
         public JavaFileObjectImpl(final String baseName, final CharSequence source) {
-            super(ClassExtensionUtils.toURI(baseName + ClassHelper.JAVA_FILE_SUFFIX), Kind.SOURCE);
+            super(ResourceHelper.toURI(baseName + ClassHelper.JAVA_FILE_SUFFIX), Kind.SOURCE);
             this.source = source;
         }
 
@@ -338,7 +354,7 @@ public class JdkCompiler extends AbstractCompiler {
          * 拼接 URI 路径
          */
         private URI uri(Location location, String packageName, String relativeName) {
-            return ClassExtensionUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
+            return ResourceHelper.toURI(location.getName() + '/' + packageName + '/' + relativeName);
         }
     }
 }

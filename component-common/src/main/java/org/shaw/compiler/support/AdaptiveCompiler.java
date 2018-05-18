@@ -11,10 +11,15 @@ import org.shaw.core.extension.ExtensionLoader;
 @Adaptive
 public class AdaptiveCompiler implements Compiler {
 
-    /** 每次需要该参数时,都需要从主内存读取,保证可见性 */
+    /** 默认编译器(每次需要该参数时,都需要从主内存读取,保证并发时内存可见性) */
     private static volatile String DEFAULT_COMPILER;
 
-    public static void setDefaultCompiler(String compiler) {
+    /**
+     * 设置默认编译器
+     *
+     * @param compiler 编译器名
+     */
+    public static void setDefaultCompiler(final String compiler) {
         DEFAULT_COMPILER = compiler;
     }
 
@@ -26,13 +31,14 @@ public class AdaptiveCompiler implements Compiler {
      * @return Class
      */
     @Override
-    public Class<?> compile(String code, ClassLoader classLoader) {
+    public Class<?> compile(final String code, final ClassLoader classLoader) {
         Compiler compiler;
-        ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
-        String name = DEFAULT_COMPILER;
+        final ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
+        final String name = DEFAULT_COMPILER;
         if (name != null && name.length() > 0) {
             compiler = loader.getExtension(name);
         } else {
+            // 默认编译器 javassist.
             compiler = loader.getDefaultExtension();
         }
         return compiler.compile(code, classLoader);
