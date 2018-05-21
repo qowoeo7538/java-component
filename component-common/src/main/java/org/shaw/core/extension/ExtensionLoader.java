@@ -3,8 +3,8 @@ package org.shaw.core.extension;
 import org.shaw.compiler.Compiler;
 import org.shaw.core.Constants;
 import org.shaw.util.ConcurrentHashSet;
+import org.shaw.util.ExceptionUtils;
 import org.shaw.util.Holder;
-import org.shaw.util.StringHelper;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -241,7 +241,7 @@ public class ExtensionLoader<T> {
             buf.append(") ");
             buf.append(entry.getKey());
             buf.append(":\r\n");
-            buf.append(StringHelper.toString(entry.getValue()));
+            buf.append(ExceptionUtils.toString(entry.getValue()));
         }
         return new IllegalStateException(buf.toString());
     }
