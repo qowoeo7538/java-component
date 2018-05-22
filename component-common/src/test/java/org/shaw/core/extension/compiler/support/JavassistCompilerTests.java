@@ -13,12 +13,14 @@ public class JavassistCompilerTests {
 
     @Test
     public void testJavassistCompiler() {
-        final Pattern IMPORT_PATTERN = Pattern.compile("import\\s+([\\w\\.\\*]+);\n");
-        String str = "package org.shaw.core.extension.compiler.support;\n"
-                + "import org.junit.Test;\n"
-                + "import java.util.regex.Matcher;\n"
-                + "import java.util.regex.Pattern;";
-
+        final Pattern EXTENDS_PATTERN = Pattern.compile("\\s+extends\\s+([\\w\\.]+)[^\\{]*\\{\n");
+        String source = "public class JavassistCompiler extends AbstractCompiler {\n"
+                + "}";
+        Matcher matcher = EXTENDS_PATTERN.matcher(source);
+        if (matcher.find()) {
+            System.out.println(matcher.group());
+            System.out.println(matcher.group(1));
+        }
     }
 
 }

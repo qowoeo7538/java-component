@@ -9,7 +9,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池满载拒绝策略
@@ -23,7 +27,7 @@ public class AbortPolicyWithReport implements RejectedExecutionHandler {
     private static volatile long lastPrintTime = 0;
 
     /** 处理间隔时间 */
-    private final static long INTERVAL_TIME = 10 * 60 * 1000;
+    private static final long INTERVAL_TIME = 10 * 60 * 1000;
 
     /** 只能同时处理一次 */
     private static Semaphore guard = new Semaphore(1);
