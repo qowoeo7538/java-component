@@ -46,6 +46,7 @@ configure(moduleProjects) { subproject ->
     apply plugin: "pmd"
     apply plugin: "findbugs"
     apply plugin: 'maven'
+    apply plugin: 'jdepend'
     apply plugin: "io.spring.dependency-management"
 
     // 定义本地maven仓库的地址, 执行:gradle clean uploadArchives 发布到本地仓库
