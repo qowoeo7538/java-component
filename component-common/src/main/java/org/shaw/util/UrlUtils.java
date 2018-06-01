@@ -11,19 +11,19 @@ import java.util.Map;
  */
 public abstract class UrlUtils {
 
-    public static String getParamsString(Map<String, String> params)
+    public static <T> String getParamsString(Map<String, T> params)
             throws UnsupportedEncodingException {
         return getParamsString(params, "UTF-8");
     }
 
-    public static String getParamsString(Map<String, String> params, String enc)
+    public static <T> String getParamsString(Map<String, T> params, String enc)
             throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
-        for (Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, String> entry = iterator.next();
+        for (Iterator<Map.Entry<String, T>> iterator = params.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, T> entry = iterator.next();
             result.append(URLEncoder.encode(entry.getKey(), enc));
             result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), enc));
+            result.append(URLEncoder.encode(entry.getValue().toString(), enc));
             result.append("&");
         }
         String resultString = result.toString();

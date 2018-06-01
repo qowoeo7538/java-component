@@ -1,7 +1,5 @@
 package org.shaw.util;
 
-import org.springframework.util.CollectionUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +7,7 @@ import java.util.Map;
  * @create: 2018-03-14
  * @description:
  */
-public class CollectionHelper extends CollectionUtils {
+public class CollectionUtils extends org.springframework.util.CollectionUtils {
 
     /**
      * 将偶数个 String 转换成 Map 对象

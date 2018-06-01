@@ -1,7 +1,7 @@
 package org.shaw.io.support;
 
 import org.shaw.util.ExceptionUtils;
-import org.shaw.util.StreamHelper;
+import org.shaw.util.StreamUtils;
 
 import java.io.RandomAccessFile;
 
@@ -30,7 +30,7 @@ public class CopyFile {
     public CopyFile(String srcName, String copyName, int count) {
         this.srcName = srcName;
         try {
-            this.fileSize = StreamHelper.getFileSize(CopyFile.this.srcName);
+            this.fileSize = StreamUtils.getFileSize(CopyFile.this.srcName);
         } catch (Exception e) {
             throw ExceptionUtils.unchecked(e);
         }

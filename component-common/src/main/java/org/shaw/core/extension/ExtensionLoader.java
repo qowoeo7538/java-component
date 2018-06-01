@@ -313,6 +313,13 @@ public class ExtensionLoader<T> {
                     + ", refuse to create the adaptive class!");
         }
 
+        /**
+         * 生成 SPI 接口的内部 Adaptive 类
+         *
+         * package           : SPI 接口包名
+         * import            : org.shaw.core.extension.ExtensionLoader
+         * class 描述        : public class {@code type.getSimpleName()}$Adaptive implements {@code type.getCanonicalName()}
+         */
         codeBuilder.append("package " + type.getPackage().getName() + ";");
         codeBuilder.append("\nimport " + ExtensionLoader.class.getName() + ";");
         codeBuilder.append("\npublic class " + type.getSimpleName() + "$Adaptive" + " implements "
@@ -334,6 +341,7 @@ public class ExtensionLoader<T> {
                         .append(type.getName()).append(" is not adaptive method!\");");
             } else {
                 String[] value = adaptiveAnnotation.value();
+                // 默认 value
                 if (value.length == 0) {
                     StringBuilder sb = new StringBuilder(128);
                     /**

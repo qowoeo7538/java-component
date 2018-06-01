@@ -7,8 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * @author zx
  * @create: 2018-03-15
- * @description:
+ * @description: 编译工具基类
  */
 public abstract class AbstractCompiler implements Compiler {
 
@@ -31,12 +32,7 @@ public abstract class AbstractCompiler implements Compiler {
     @Override
     public Class<?> compile(String code, final ClassLoader classLoader) {
         code = code.trim();
-        /**
-         * 判断 code 中是否包含 package、class 关键字。
-         *
-         * pkg: 包名
-         * cls：类名
-         */
+        // pkg: 包名
         Matcher matcher = PACKAGE_PATTERN.matcher(code);
         String pkg;
         if (matcher.find()) {
@@ -44,7 +40,7 @@ public abstract class AbstractCompiler implements Compiler {
         } else {
             pkg = "";
         }
-        // 判断 code 中是否包含 class 关键字
+        // cls：类名
         matcher = CLASS_PATTERN.matcher(code);
         String cls;
         if (matcher.find()) {
@@ -52,6 +48,7 @@ public abstract class AbstractCompiler implements Compiler {
         } else {
             throw new IllegalArgumentException("没有类名： " + code);
         }
+        // 类全名
         String className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
         try {
             // 尝试加载 class 文件到内存
@@ -75,7 +72,7 @@ public abstract class AbstractCompiler implements Compiler {
     /**
      * 对 java 文件进行编译
      *
-     * @param name   类名
+     * @param name   类全名
      * @param source 源代码
      * @return Class
      * @throws Throwable

@@ -1,7 +1,7 @@
 package org.shaw.compiler.support;
 
-import org.shaw.util.ClassHelper;
-import org.shaw.util.ResourceHelper;
+import org.shaw.util.ClassUtils;
+import org.shaw.util.ResourceUtils;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -62,13 +62,13 @@ public class JdkCompiler extends AbstractCompiler {
          *   2) 在多个编译任务之间共享
          */
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-        final ClassLoader loader = ClassHelper.getDefaultClassLoader();
+        final ClassLoader loader = ClassUtils.getDefaultClassLoader();
         /**
          * 1) 是 URLClassLoader 加载器的实例(通过指向目标文件加载类)
          * 2) 不是默认的类加载器
          */
         if (loader instanceof URLClassLoader
-                && (!ClassHelper.APP_CLASSLOADER.equals(loader.getClass().getName()))) {
+                && (!ClassUtils.APP_CLASSLOADER.equals(loader.getClass().getName()))) {
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<>();
@@ -128,7 +128,7 @@ public class JdkCompiler extends AbstractCompiler {
                 return defineClass(name, bytes, 0, bytes.length);
             }
             try {
-                return ClassHelper.forName(name, getClass().getClassLoader());
+                return ClassUtils.forName(name, getClass().getClassLoader());
             } catch (ClassNotFoundException nf) {
                 return super.findClass(name);
             }
@@ -165,10 +165,10 @@ public class JdkCompiler extends AbstractCompiler {
          */
         @Override
         public InputStream getResourceAsStream(final String name) {
-            if (name.endsWith(ClassHelper.CLASS_FILE_SUFFIX)) {
+            if (name.endsWith(ClassUtils.CLASS_FILE_SUFFIX)) {
                 // 获取类全名
                 String qualifiedClassName = name.substring(0,
-                        name.length() - ClassHelper.CLASS_FILE_SUFFIX.length()).replace('/', '.');
+                        name.length() - ClassUtils.CLASS_FILE_SUFFIX.length()).replace('/', '.');
                 // 通过类全名获取 JavaFileObjectImpl
                 JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
                 if (file != null) {
@@ -191,12 +191,12 @@ public class JdkCompiler extends AbstractCompiler {
         private ByteArrayOutputStream bytecode;
 
         JavaFileObjectImpl(final String name, final Kind kind) {
-            super(ResourceHelper.toURI(name), kind);
+            super(ResourceUtils.toURI(name), kind);
             source = null;
         }
 
         public JavaFileObjectImpl(final String baseName, final CharSequence source) {
-            super(ResourceHelper.toURI(baseName + ClassHelper.JAVA_FILE_SUFFIX), Kind.SOURCE);
+            super(ResourceUtils.toURI(baseName + ClassUtils.JAVA_FILE_SUFFIX), Kind.SOURCE);
             this.source = source;
         }
 
@@ -345,7 +345,7 @@ public class JdkCompiler extends AbstractCompiler {
         public Iterable<JavaFileObject> list(Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse)
                 throws IOException {
             Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
-            ClassLoader contextClassLoader = ClassHelper.getDefaultClassLoader();
+            ClassLoader contextClassLoader = ClassUtils.getDefaultClassLoader();
             List<URL> urlList = new ArrayList<>();
             return null;
         }
@@ -354,7 +354,7 @@ public class JdkCompiler extends AbstractCompiler {
          * 拼接 URI 路径
          */
         private URI uri(Location location, String packageName, String relativeName) {
-            return ResourceHelper.toURI(location.getName() + '/' + packageName + '/' + relativeName);
+            return ResourceUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
         }
     }
 }

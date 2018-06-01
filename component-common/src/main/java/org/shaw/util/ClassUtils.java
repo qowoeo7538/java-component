@@ -1,11 +1,9 @@
 package org.shaw.util;
 
-import org.springframework.util.ClassUtils;
-
 /**
  * Class 工具类
  */
-public abstract class ClassHelper extends ClassUtils {
+public abstract class ClassUtils extends org.springframework.util.ClassUtils {
 
     /** The package separator String: "." */
     public static final String PACKAGE_SEPARATOR = ".";

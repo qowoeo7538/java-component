@@ -1,7 +1,6 @@
 package org.shaw.util;
 
 import org.shaw.io.support.ReadProcess;
-import org.springframework.util.StreamUtils;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -20,7 +19,7 @@ import java.security.MessageDigest;
 /**
  * io工具类
  */
-public abstract class StreamHelper extends StreamUtils {
+public abstract class StreamUtils extends org.springframework.util.StreamUtils {
 
     /**
      * 通道处理工具类
