@@ -3,7 +3,6 @@ package org.shaw.core.extension;
 import org.junit.Test;
 import org.shaw.core.extension.adaptive.HasAdaptiveExt;
 import org.shaw.core.extension.adaptive.impl.HasAdaptiveExtManualAdaptive;
-import org.shaw.core.extension.entity.URL;
 import org.shaw.core.extension.ext1.SimpleExt;
 
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import static org.junit.Assert.assertTrue;
  * SPI 测试
  */
 public class ExtensionLoaderAdaptiveTests {
+
     @Test
     public void testUseAdaptiveClass() {
         ExtensionLoader<HasAdaptiveExt> loader = ExtensionLoader.getExtensionLoader(HasAdaptiveExt.class);
@@ -29,9 +29,14 @@ public class ExtensionLoaderAdaptiveTests {
             SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
             Map<String, String> map = new HashMap<>();
 
-            URL url = new URL("p1", "1.2.3.4", 1010, "path1", map);
+            ExtURL url = new ExtURL("p1", "1.2.3.4", 1010, "path1", map);
             String echo = ext.echo(url, "haha");
             assertEquals("Ext1Impl1-echo", echo);
         }
     }
 }
+
+
+
+
+

@@ -16,19 +16,19 @@
  */
 package org.shaw.core.extension.ext1.impl;
 
-import org.shaw.core.extension.entity.URL;
+import org.shaw.core.extension.ExtURL;
 import org.shaw.core.extension.ext1.SimpleExt;
 
 public class SimpleExtImpl3 implements SimpleExt {
-    public String echo(URL url, String s) {
+    public String echo(ExtURL url, String s) {
         return "Ext1Impl3-echo";
     }
 
-    public String yell(URL url, String s) {
+    public String yell(ExtURL url, String s) {
         return "Ext1Impl3-yell";
     }
 
-    public String bang(URL url, int i) {
+    public String bang(ExtURL url, int i) {
         return "bang3";
     }
 

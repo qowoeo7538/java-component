@@ -3,6 +3,7 @@ package org.shaw.compiler.support;
 import org.shaw.compiler.Compiler;
 import org.shaw.core.extension.Adaptive;
 import org.shaw.core.extension.ExtensionLoader;
+import org.shaw.util.StringUtils;
 
 /**
  * @create: 2018-03-15
@@ -35,11 +36,11 @@ public class AdaptiveCompiler implements Compiler {
         Compiler compiler;
         final ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
         final String name = DEFAULT_COMPILER;
-        if (name != null && name.length() > 0) {
-            compiler = loader.getExtension(name);
-        } else {
+        if (StringUtils.isEmpty(name)) {
             // 默认编译器 javassist.
             compiler = loader.getDefaultExtension();
+        } else {
+            compiler = loader.getExtension(name);
         }
         return compiler.compile(code, classLoader);
     }

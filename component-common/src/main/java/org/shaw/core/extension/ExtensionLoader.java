@@ -340,6 +340,63 @@ public class ExtensionLoader<T> {
                         .append(method.toString()).append(" of interface ")
                         .append(type.getName()).append(" is not adaptive method!\");");
             } else {
+                // RUL 处理
+                int urlTypeIndex = -1;
+                for (int i = 0; i < pts.length; ++i) {
+                    if (pts[i].equals(ExtURL.class)) {
+                        urlTypeIndex = i;
+                        break;
+                    }
+                }
+
+                // 对 URL 参数进行空指针检查
+                if (urlTypeIndex != -1) {
+                    String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"url == null\");",
+                            urlTypeIndex);
+                    code.append(s);
+
+                    s = String.format("\n%s url = arg%d;", ExtURL.class.getName(), urlTypeIndex);
+                    code.append(s);
+
+                } else {
+                    // 没有找到 URL.
+                    String attribMethod = null;
+
+                    // 在参数中寻找 URL.
+                    LBL_PTS:
+                    for (int i = 0; i < pts.length; ++i) {
+                        Method[] ms = pts[i].getMethods();
+                        for (Method m : ms) {
+                            String name = m.getName();
+                            if ((name.startsWith("get") || name.length() > 3)
+                                    && Modifier.isPublic(m.getModifiers())
+                                    && !Modifier.isStatic(m.getModifiers())
+                                    && m.getParameterTypes().length == 0
+                                    && m.getReturnType() == URL.class) {
+                                urlTypeIndex = i;
+                                attribMethod = name;
+                                break LBL_PTS;
+                            }
+                        }
+                    }
+                    if (attribMethod == null) {
+                        throw new IllegalStateException("fail to create adaptive class for interface " + type.getName()
+                                + ": not found url parameter or url attribute in parameters of method " + method.getName());
+                    }
+
+                    // 空指针检查
+                    String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"%s argument == null\");",
+                            urlTypeIndex, pts[urlTypeIndex].getName());
+                    code.append(s);
+                    s = String.format("\nif (arg%d.%s() == null) throw new IllegalArgumentException(\"%s argument %s() == null\");",
+                            urlTypeIndex, attribMethod, pts[urlTypeIndex].getName(), attribMethod);
+                    code.append(s);
+
+                    // url 赋值
+                    s = String.format("%s url = arg%d.%s();", URL.class.getName(), urlTypeIndex, attribMethod);
+                    code.append(s);
+                }
+
                 String[] value = adaptiveAnnotation.value();
                 // 默认 value
                 if (value.length == 0) {
@@ -360,7 +417,21 @@ public class ExtensionLoader<T> {
                     }
                     value = new String[]{sb.toString()};
                 }
+
+                String defaultExtName = cachedDefaultName;
                 String getNameCode = null;
+                for (int i = value.length - 1; i >= 0; --i) {
+                    if (i == value.length - 1) {
+                        if (null != defaultExtName) {
+                            getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
+                        } else {
+                            getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
+                        }
+                    }else {
+                        getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
+                    }
+                }
+
                 code.append("\nString extName = ").append(getNameCode).append(";");
                 String s = String.format("\nif(extName == null) " +
                                 "throw new IllegalStateException(\"Fail to get extension(%s) name from url(\" + url.toString() + \") use keys(%s)\");",

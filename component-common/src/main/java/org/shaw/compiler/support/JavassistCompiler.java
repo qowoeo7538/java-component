@@ -4,6 +4,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtNewConstructor;
+import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import org.shaw.util.ClassUtils;
 
@@ -122,6 +123,9 @@ public class JavassistCompiler extends AbstractCompiler {
                 } else if (FIELD_PATTERN.matcher(method).matches()) {
                     // 添加字段
                     cls.addField(CtField.make("private " + method, cls));
+                } else {
+                    // 在类中根据源代码创建一个方法
+                    cls.addMethod(CtNewMethod.make("public " + method, cls));
                 }
             }
         }
