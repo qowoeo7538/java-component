@@ -11,8 +11,7 @@ import java.util.Map;
 import static org.shaw.core.Constants.DEFAULT_KEY_PREFIX;
 
 /**
- * @create: 2018-06-01
- * @description:
+ * 该对象同 String 类型设计一样, 都是不可变对象. 当操作发生属性改变时,会返回新的对象.
  */
 public final class ExtURL implements Serializable {
 
@@ -73,6 +72,10 @@ public final class ExtURL implements Serializable {
         this.parameters = Collections.unmodifiableMap(parameters);
     }
 
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
     public String getParameter(String key) {
         String value = parameters.get(key);
         if (StringUtils.isEmpty(value)) {
@@ -87,5 +90,21 @@ public final class ExtURL implements Serializable {
             return defaultValue;
         }
         return value;
+    }
+
+    public ExtURL addParameter(String key, String value) {
+        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value)) {
+            return this;
+        }
+
+        // 如果值重复, 则立即返回
+        if (value.equals(getParameters().get(key))) {
+            return this;
+        }
+
+        // 如果值改变, 则重新生成对象返回
+        Map<String, String> map = new HashMap<>(getParameters());
+        map.put(key, value);
+        return new ExtURL(protocol, username, password, host, port, path, map);
     }
 }
