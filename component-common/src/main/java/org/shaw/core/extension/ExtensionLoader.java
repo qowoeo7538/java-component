@@ -340,7 +340,7 @@ public class ExtensionLoader<T> {
                         .append(method.toString()).append(" of interface ")
                         .append(type.getName()).append(" is not adaptive method!\");");
             } else {
-                // RUL 处理
+                // ExtRUL 处理
                 int urlTypeIndex = -1;
                 for (int i = 0; i < pts.length; ++i) {
                     if (pts[i].equals(ExtURL.class)) {
@@ -349,7 +349,7 @@ public class ExtensionLoader<T> {
                     }
                 }
 
-                // 对 URL 参数进行空指针检查
+                // 对 ExtURL 参数进行空指针检查
                 if (urlTypeIndex != -1) {
                     String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"url == null\");",
                             urlTypeIndex);
@@ -423,12 +423,25 @@ public class ExtensionLoader<T> {
                 for (int i = value.length - 1; i >= 0; --i) {
                     if (i == value.length - 1) {
                         if (null != defaultExtName) {
-                            getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
+                            // 判断注解中是否存在 "protocol"
+                            if (!"protocol".equals(value[i])) {
+                                getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
+                            } else {
+                                getNameCode = String.format("( url.getProtocol() == null ? \"%s\" : url.getProtocol() )", defaultExtName);
+                            }
                         } else {
-                            getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
+                            if (!"protocol".equals(value[i])) {
+                                getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
+                            } else {
+                                getNameCode = "url.getProtocol()";
+                            }
                         }
-                    }else {
-                        getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
+                    } else {
+                        if (!"protocol".equals(value[i])) {
+                            getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
+                        } else {
+                            getNameCode = String.format("url.getProtocol() == null ? (%s) : url.getProtocol()", getNameCode);
+                        }
                     }
                 }
 

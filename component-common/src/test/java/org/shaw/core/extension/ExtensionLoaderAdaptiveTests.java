@@ -4,12 +4,14 @@ import org.junit.Test;
 import org.shaw.core.extension.adaptive.HasAdaptiveExt;
 import org.shaw.core.extension.adaptive.impl.HasAdaptiveExtManualAdaptive;
 import org.shaw.core.extension.ext1.SimpleExt;
+import org.shaw.core.extension.ext3.UseProtocolKeyExt;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * SPI 测试
@@ -17,14 +19,14 @@ import static org.junit.Assert.assertTrue;
 public class ExtensionLoaderAdaptiveTests {
 
     @Test
-    public void testUseAdaptiveClass() {
+    public void test_useAdaptiveClass() {
         ExtensionLoader<HasAdaptiveExt> loader = ExtensionLoader.getExtensionLoader(HasAdaptiveExt.class);
         HasAdaptiveExt ext = loader.getAdaptiveExtension();
         assertTrue(ext instanceof HasAdaptiveExtManualAdaptive);
     }
 
     @Test
-    public void testGetAdaptiveExtensionDefaultAdaptiveKey() {
+    public void test_getAdaptiveExtension_defaultAdaptiveKey() {
         {
             SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
             Map<String, String> map = new HashMap<>();
@@ -37,7 +39,7 @@ public class ExtensionLoaderAdaptiveTests {
         {
             SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
 
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             map.put("simple.ext", "impl2");
             ExtURL url = new ExtURL("p1", "1.2.3.4", 1010, "path1", map);
 
@@ -67,11 +69,11 @@ public class ExtensionLoaderAdaptiveTests {
         UseProtocolKeyExt ext = ExtensionLoader.getExtensionLoader(UseProtocolKeyExt.class).getAdaptiveExtension();
 
         {
-            String echo = ext.echo(URL.valueOf("1.2.3.4:20880"), "s");
+            String echo = ext.echo(ExtURL.valueOf("1.2.3.4:20880"), "s");
             assertEquals("Ext3Impl1-echo", echo); // default value
 
             Map<String, String> map = new HashMap<String, String>();
-            URL url = new URL("impl3", "1.2.3.4", 1010, "path1", map);
+            ExtURL url = new ExtURL("impl3", "1.2.3.4", 1010, "path1", map);
 
             echo = ext.echo(url, "s");
             assertEquals("Ext3Impl3-echo", echo); // use 2nd key, protocol
@@ -84,7 +86,7 @@ public class ExtensionLoaderAdaptiveTests {
         {
 
             Map<String, String> map = new HashMap<String, String>();
-            URL url = new URL(null, "1.2.3.4", 1010, "path1", map);
+            ExtURL url = new ExtURL(null, "1.2.3.4", 1010, "path1", map);
             String yell = ext.yell(url, "s");
             assertEquals("Ext3Impl1-yell", yell); // default value
 
@@ -97,9 +99,16 @@ public class ExtensionLoaderAdaptiveTests {
             assertEquals("Ext3Impl3-yell", yell);
         }
     }
+
+    @Test
+    public void test_getAdaptiveExtension_UrlNpe() throws Exception {
+        SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getAdaptiveExtension();
+
+        try {
+            ext.echo(null, "haha");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("url == null", e.getMessage());
+        }
+    }
 }
-
-
-
-
-
