@@ -372,7 +372,7 @@ public class ExtensionLoader<T> {
                                     && Modifier.isPublic(m.getModifiers())
                                     && !Modifier.isStatic(m.getModifiers())
                                     && m.getParameterTypes().length == 0
-                                    && m.getReturnType() == URL.class) {
+                                    && m.getReturnType() == ExtURL.class) {
                                 urlTypeIndex = i;
                                 attribMethod = name;
                                 break LBL_PTS;
@@ -393,7 +393,7 @@ public class ExtensionLoader<T> {
                     code.append(s);
 
                     // url 赋值
-                    s = String.format("%s url = arg%d.%s();", URL.class.getName(), urlTypeIndex, attribMethod);
+                    s = String.format("%s url = arg%d.%s();", ExtURL.class.getName(), urlTypeIndex, attribMethod);
                     code.append(s);
                 }
 

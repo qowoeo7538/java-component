@@ -52,12 +52,36 @@ public final class ExtURL implements Serializable {
         this.parameters = null;
     }
 
-    public ExtURL(String protocol, String username, String password, String host, int port, String path, String... pairs) {
-        this(protocol, username, password, host, port, path, CollectionUtils.toStringMap(pairs));
+    public ExtURL(String protocol, String host, int port) {
+        this(protocol, null, null, host, port, null, (Map<String, String>) null);
+    }
+
+    public ExtURL(String protocol, String host, int port, String[] pairs) { // varargs ... confilict with the following path argument, use array instead.
+        this(protocol, null, null, host, port, null, CollectionUtils.toStringMap(pairs));
+    }
+
+    public ExtURL(String protocol, String host, int port, Map<String, String> parameters) {
+        this(protocol, null, null, host, port, null, parameters);
+    }
+
+    public ExtURL(String protocol, String host, int port, String path) {
+        this(protocol, null, null, host, port, path, (Map<String, String>) null);
+    }
+
+    public ExtURL(String protocol, String host, int port, String path, String... pairs) {
+        this(protocol, null, null, host, port, path, CollectionUtils.toStringMap(pairs));
     }
 
     public ExtURL(String protocol, String host, int port, String path, Map<String, String> parameters) {
         this(protocol, null, null, host, port, path, parameters);
+    }
+
+    public ExtURL(String protocol, String username, String password, String host, int port, String path) {
+        this(protocol, username, password, host, port, path, (Map<String, String>) null);
+    }
+
+    public ExtURL(String protocol, String username, String password, String host, int port, String path, String... pairs) {
+        this(protocol, username, password, host, port, path, CollectionUtils.toStringMap(pairs));
     }
 
     public ExtURL(String protocol, String username, String password, String host, int port, String path, Map<String, String> parameters) {
@@ -161,6 +185,61 @@ public final class ExtURL implements Serializable {
 
     public String getServiceInterface() {
         return getParameter(Constants.INTERFACE_KEY, path);
+    }
+
+    /**
+     * 添加成对的参数
+     */
+    public ExtURL addParameters(String... pairs) {
+        if (pairs == null || pairs.length == 0) {
+            return this;
+        }
+        if (pairs.length % 2 != 0) {
+            throw new IllegalArgumentException("Map pairs can not be odd number.");
+        }
+        Map<String, String> map = new HashMap<>(16);
+        int len = pairs.length / 2;
+        for (int i = 0; i < len; i++) {
+            map.put(pairs[2 * i], pairs[2 * i + 1]);
+        }
+        return addParameters(map);
+    }
+
+    /**
+     * 添加参数
+     */
+    public ExtURL addParameters(Map<String, String> parameters) {
+        if (parameters == null || parameters.size() == 0) {
+            return this;
+        }
+
+        boolean hasAndEqual = true;
+        for (Iterator<Map.Entry<String, String>> iterator = parameters.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, String> entry = iterator.next();
+            // 通过key获取值
+            String value = getParameters().get(entry.getKey());
+            // 判断参数是否跟现有的参数匹配
+            if (value == null) {
+                if (entry.getValue() != null) {
+                    hasAndEqual = false;
+                    break;
+                }
+            } else {
+                if (!value.equals(entry.getValue())) {
+                    hasAndEqual = false;
+                    break;
+                }
+            }
+        }
+
+        // 如果参数都匹配, 则返回当前对象
+        if (hasAndEqual) {
+            return this;
+        }
+        // 等价一次拷贝
+        Map<String, String> map = new HashMap<>(getParameters());
+        map.putAll(parameters);
+        return new ExtURL(protocol, username, password, host, port, path, map);
     }
 
     public Map<String, String> getParameters() {
