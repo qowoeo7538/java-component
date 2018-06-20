@@ -25,7 +25,7 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 /**
  * SPI 测试
  */
-public class ExtensionLoaderAdaptiveTests {
+public class ExtensionLoader_Adaptive_Test {
 
     @Test
     public void test_useAdaptiveClass() {

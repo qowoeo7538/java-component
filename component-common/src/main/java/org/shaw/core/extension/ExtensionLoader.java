@@ -2,31 +2,38 @@ package org.shaw.core.extension;
 
 import org.shaw.compiler.Compiler;
 import org.shaw.core.Constants;
+import org.shaw.core.extension.support.ActivateComparator;
 import org.shaw.util.ConcurrentHashSet;
+import org.shaw.util.ConfigUtils;
 import org.shaw.util.ExceptionUtils;
 import org.shaw.util.Holder;
+import org.shaw.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Pattern;
 
 public class ExtensionLoader<T> {
 
-    /** 将字符串按 "," 分割 */
-    private static final Pattern NAME_SEPARATOR = Pattern.compile("\\s*[,]+\\s*");
+    private static final String REMOVE_VALUE_PREFIX = "-";
+
+    private static final String DEFAULT_KEY = "default";
+
+    // ===================================================================
 
     /** 默认 SPI 目录 */
     private static final String SERVICES_DIRECTORY = "META-INF/services/";
@@ -54,10 +61,11 @@ public class ExtensionLoader<T> {
 
     private final ExtensionFactory objectFactory;
 
-    private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<Class<?>, String>();
-
     /** {@code Holder} 维护一个 Object 对象 */
     private final Holder<Object> cachedAdaptiveInstance = new Holder<>();
+
+    /** SPI实现类的 Class -> 实现类的别名 */
+    private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
 
     /** {@code Holder} 维护一个 Map:{type 实现类的别名 -> 实现类的 Class} */
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
@@ -120,6 +128,53 @@ public class ExtensionLoader<T> {
         return (T) instance;
     }
 
+    public List<T> getActivateExtension(ExtURL url, String key, String group) {
+        String value = url.getParameter(key);
+        return getActivateExtension(url, value == null || value.length() == 0 ? null : Constants.COMMA_SPLIT_PATTERN.split(value), group);
+    }
+
+    public List<T> getActivateExtension(ExtURL url, String[] values, String group) {
+        List<T> exts = new ArrayList<>();
+        List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
+        if (!names.contains(REMOVE_VALUE_PREFIX + DEFAULT_KEY)) {
+            getExtensionClasses();
+            for (Iterator<Map.Entry<String, Activate>> iterator = cachedActivates.entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, Activate> entry = iterator.next();
+                String name = entry.getKey();
+                Activate activate = entry.getValue();
+                if (isMatchGroup(group, activate.group())) {
+                    T ext = getExtension(name);
+                    if (!names.contains(name)
+                            && !names.contains(REMOVE_VALUE_PREFIX + name)
+                            && isActive(activate, url)) {
+                        exts.add(ext);
+                    }
+                }
+            }
+            Collections.sort(exts, ActivateComparator.getComparator());
+        }
+        List<T> usrs = new ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            String name = names.get(i);
+            if (!name.startsWith(REMOVE_VALUE_PREFIX)
+                    && !names.contains(REMOVE_VALUE_PREFIX + name)) {
+                if (DEFAULT_KEY.equals(name)) {
+                    if (!usrs.isEmpty()) {
+                        exts.addAll(0, usrs);
+                        usrs.clear();
+                    }
+                } else {
+                    T ext = getExtension(name);
+                    usrs.add(ext);
+                }
+            }
+        }
+        if (!usrs.isEmpty()) {
+            exts.addAll(usrs);
+        }
+        return exts;
+    }
+
     /**
      * 尝试从 {@link #EXTENSION_LOADERS} 获取 {@code ExtensionLoader}，
      * 如果为 {@code null}, 再构造该 Class 的 {@code ExtensionLoader} 放入 {@link #EXTENSION_LOADERS}
@@ -146,6 +201,54 @@ public class ExtensionLoader<T> {
             loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
         }
         return loader;
+    }
+
+    /**
+     * @param name
+     * @param clazz
+     * @see #getExtensionClasses()
+     */
+    public void addExtension(String name, Class<?> clazz) {
+        // 根据配置文件加载
+        getExtensionClasses();
+        // 判断是否是SPI接口的实现类
+        if (!type.isAssignableFrom(clazz)) {
+            throw new IllegalStateException("Input type " +
+                    clazz + "not implement Extension " + type);
+        }
+        // 判断是否是接口
+        if (clazz.isInterface()) {
+            throw new IllegalStateException("Input type " +
+                    clazz + "can not be interface!");
+        }
+        if (!clazz.isAnnotationPresent(Adaptive.class)) {
+            if (StringUtils.isEmpty(name)) {
+                throw new IllegalStateException("Extension name is blank (Extension " + type + ")!");
+            }
+            // 判断该别名是否已经被其它实现类使用
+            if (cachedClasses.get().containsKey(name)) {
+                throw new IllegalStateException("Extension name " +
+                        name + " already existed(Extension " + type + ")!");
+            }
+            // 加入到缓存信息中
+            cachedNames.put(clazz, name);
+            cachedClasses.get().put(name, clazz);
+        } else {
+            if (cachedAdaptiveClass != null) {
+                throw new IllegalStateException("Adaptive Extension already existed(Extension " + type + ")!");
+            }
+            cachedAdaptiveClass = clazz;
+        }
+    }
+
+    /**
+     * 根据类类型获取别名
+     *
+     * @param extensionClass SPI实现类类型
+     * @return 别名
+     */
+    public String getExtensionName(Class<?> extensionClass) {
+        return cachedNames.get(extensionClass);
     }
 
     public T getExtension(String name) {
@@ -190,7 +293,27 @@ public class ExtensionLoader<T> {
     }
 
     /**
-     * 根据扩展类别名获取实例对象
+     * 返回默认的别名, 如果返回 {@code null} 则没有配置
+     */
+    public String getDefaultExtensionName() {
+        getExtensionClasses();
+        return cachedDefaultName;
+    }
+
+    public boolean hasExtension(String name) {
+        if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException("Extension name == null");
+        }
+        try {
+            this.getExtensionClass(name);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * 根据扩展类别名加载实例对象
      *
      * @param name 扩展类别名
      * @see #getExtensionClasses()
@@ -255,6 +378,46 @@ public class ExtensionLoader<T> {
      */
     private static <T> boolean withExtensionAnnotation(Class<T> type) {
         return type.isAnnotationPresent(SPI.class);
+    }
+
+    private boolean isActive(Activate activate, ExtURL url) {
+        String[] keys = activate.value();
+        if (keys.length == 0) {
+            return true;
+        }
+        for (String key : keys) {
+            for (Iterator<Map.Entry<String, String>> iterator = url.getParameters().entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, String> entry = iterator.next();
+                String k = entry.getKey();
+                String v = entry.getValue();
+                if ((k.equals(key) || k.endsWith("." + key))
+                        && !ConfigUtils.isEmpty(v)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断一个组是否包含在一组列表中
+     *
+     * @param group  组名
+     * @param groups 数组列表
+     * @return if {@code true} 包含
+     */
+    private boolean isMatchGroup(String group, String[] groups) {
+        if (group == null || group.length() == 0) {
+            return true;
+        }
+        if (groups != null && groups.length > 0) {
+            for (String g : groups) {
+                if (group.equals(g)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -498,6 +661,26 @@ public class ExtensionLoader<T> {
     }
 
     /**
+     * 尝试根据别名进行加载类
+     *
+     * @param name 别名
+     * @return {@code true} 加载成功
+     */
+    private Class<?> getExtensionClass(String name) {
+        if (type == null) {
+            throw new IllegalArgumentException("Extension type == null");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("Extension name == null");
+        }
+        Class<?> clazz = getExtensionClasses().get(name);
+        if (clazz == null) {
+            throw new IllegalStateException("No such extension \"" + name + "\" for " + type.getName() + "!");
+        }
+        return clazz;
+    }
+
+    /**
      * 双重检查
      * 获取 {@link #cachedClasses}
      *
@@ -521,7 +704,7 @@ public class ExtensionLoader<T> {
      * 读取的 SPI 目录下对应的文件,加载 Class.
      *
      * @return Map:{别名 -> Class}
-     * @see #loadDirectory(Map, String)
+     * @see #loadDirectory(Map, String, String)
      */
     private Map<String, Class<?>> loadExtensionClasses() {
         // 获取 SPI 接口的注解信息
@@ -530,7 +713,7 @@ public class ExtensionLoader<T> {
             String value = defaultAnnotation.value();
             if ((value = value.trim()).length() > 0) {
                 // 将 SPI 注解信息的 value 按照 "," 进行切割
-                String[] names = NAME_SEPARATOR.split(value);
+                String[] names = Constants.COMMA_SPLIT_PATTERN.split(value);
                 if (names.length > 1) {
                     throw new IllegalStateException("默认扩展名超过最大长度[1] " + type.getName() + ": " + Arrays.toString(names));
                 }
@@ -540,9 +723,9 @@ public class ExtensionLoader<T> {
             }
         }
         final Map<String, Class<?>> extensionClasses = new HashMap<>(16);
-        loadDirectory(extensionClasses, INTERNAL_DIRECTORY);
-        loadDirectory(extensionClasses, DIRECTORY);
-        loadDirectory(extensionClasses, SERVICES_DIRECTORY);
+        loadDirectory(extensionClasses, INTERNAL_DIRECTORY, type.getName());
+        loadDirectory(extensionClasses, DIRECTORY, type.getName());
+        loadDirectory(extensionClasses, SERVICES_DIRECTORY, type.getName());
         return extensionClasses;
     }
 
@@ -551,10 +734,11 @@ public class ExtensionLoader<T> {
      *
      * @param extensionClasses Map:{别名 -> Class}
      * @param dir              SPI 文件目录
+     * @param type             接口文件名称
      */
-    private void loadDirectory(final Map<String, Class<?>> extensionClasses, final String dir) {
+    private void loadDirectory(final Map<String, Class<?>> extensionClasses, final String dir, final String type) {
         // 获取对应的 SPI 接口描述文件
-        final String fileName = dir + type.getName();
+        final String fileName = dir + type;
         try {
             Enumeration<URL> urls;
             final ClassLoader classLoader = findClassLoader();
@@ -651,7 +835,7 @@ public class ExtensionLoader<T> {
             }
             wrappers.add(clazz);
         } else {
-            // 至少需要一无参构造器
+            // 至少需要一个无参构造器
             clazz.getConstructor();
             if (name == null || name.length() == 0) {
                 // 默认类名为别名
@@ -660,12 +844,11 @@ public class ExtensionLoader<T> {
                     name = name.substring(0, name.length() - type.getSimpleName().length());
                 }
                 name = name.toLowerCase();
-
                 if (name.length() == 0) {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
             }
-            final String[] names = NAME_SEPARATOR.split(name);
+            final String[] names = Constants.COMMA_SPLIT_PATTERN.split(name);
             if (names != null && names.length > 0) {
                 // 获取 @Activate 注解信息
                 final Activate activate = clazz.getAnnotation(Activate.class);

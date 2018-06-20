@@ -278,6 +278,33 @@ public final class ExtURL implements Serializable {
         return new ExtURL(protocol, username, password, host, port, path, map);
     }
 
+    public ExtURL removeParameter(String key) {
+        if (key == null || key.length() == 0) {
+            return this;
+        }
+        return removeParameters(key);
+    }
+
+    /**
+     * 删除参数
+     *
+     * @param keys key
+     * @return 删除对应参数的新对象
+     */
+    public ExtURL removeParameters(String... keys) {
+        if (keys == null || keys.length == 0) {
+            return this;
+        }
+        Map<String, String> map = new HashMap<>(getParameters());
+        for (String key : keys) {
+            map.remove(key);
+        }
+        if (map.size() == getParameters().size()) {
+            return this;
+        }
+        return new ExtURL(protocol, username, password, host, port, path, map);
+    }
+
     /**
      * 判断参数是否有值
      *

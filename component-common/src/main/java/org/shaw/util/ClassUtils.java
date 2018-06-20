@@ -48,7 +48,7 @@ public abstract class ClassUtils extends org.springframework.util.ClassUtils {
                 // 匹配所有的导入包,尝试加载
                 for (String pkg : packages) {
                     try {
-                        return forName(pkg + "." + className, classLoader);
+                        return forName(pkg + PACKAGE_SEPARATOR + className, classLoader);
                     } catch (ClassNotFoundException e2) {
                     }
                 }

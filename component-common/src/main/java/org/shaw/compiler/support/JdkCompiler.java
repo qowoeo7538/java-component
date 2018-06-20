@@ -25,13 +25,17 @@ import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * JDK动态编译
  */
 public class JdkCompiler extends AbstractCompiler {
 
@@ -49,12 +53,17 @@ public class JdkCompiler extends AbstractCompiler {
     /** 编译相关参数 */
     private volatile List<String> options;
 
+    /**
+     * 初始步骤:
+     * 1) 构建java文件管理器
+     * 2) 获取加载器
+     */
     public JdkCompiler() {
         options = new ArrayList<>();
         options.add("-source");
-        options.add("1.6");
+        options.add("1.8");
         options.add("-target");
-        options.add("1.6");
+        options.add("1.8");
         /**
          * 标准的java文件管理器(java编译器需要)
          * 作用:
@@ -90,9 +99,22 @@ public class JdkCompiler extends AbstractCompiler {
     }
 
     @Override
-    protected Class<?> doCompile(String name, String source) throws Throwable {
-
-        return null;
+    protected Class<?> doCompile(String name, String sourceCode) throws Throwable {
+        int i = name.lastIndexOf('.');
+        String packageName = i < 0 ? "" : name.substring(0, i);
+        String className = i < 0 ? name : name.substring(i + 1);
+        // 构建文件对象
+        JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
+        // 将文件对象跟java文件管理器绑定
+        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName,
+                className + ClassUtils.JAVA_FILE_SUFFIX, javaFileObject);
+        // 根据组建创建编译任务,并进行编译
+        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options,
+                null, Arrays.asList(javaFileObject)).call();
+        if (result == null || !result) {
+            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector);
+        }
+        return classLoader.loadClass(name);
     }
 
     /**
@@ -101,13 +123,19 @@ public class JdkCompiler extends AbstractCompiler {
     private final class ClassLoaderImpl extends ClassLoader {
 
         /**
-         * key: 类名
-         * value: JavaFileObject java文件
+         * Map: 类名 -> JavaFileObject java文件
          */
         private final Map<String, JavaFileObject> classes = new HashMap<>();
 
         ClassLoaderImpl(final ClassLoader parentClassLoader) {
             super(parentClassLoader);
+        }
+
+        /**
+         * @return 返回不可修改的 classes中的 JavaFileObject 集合
+         */
+        Collection<JavaFileObject> files() {
+            return Collections.unmodifiableCollection(classes.values());
         }
 
         /**
@@ -195,6 +223,12 @@ public class JdkCompiler extends AbstractCompiler {
             source = null;
         }
 
+        /**
+         * 通过类全名和 sourceCode 构建java文件对象
+         *
+         * @param baseName 类全名
+         * @param source   源代码
+         */
         public JavaFileObjectImpl(final String baseName, final CharSequence source) {
             super(ResourceUtils.toURI(baseName + ClassUtils.JAVA_FILE_SUFFIX), Kind.SOURCE);
             this.source = source;
@@ -307,6 +341,18 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         /**
+         * 将java文件放入文件对象 {@code fileObjects}
+         *
+         * @param location
+         * @param packageName
+         * @param relativeName
+         * @param file
+         */
+        public void putFileForInput(StandardLocation location, String packageName, String relativeName, JavaFileObject file) {
+            fileObjects.put(uri(location, packageName, relativeName), file);
+        }
+
+        /**
          * 返回该类维护的 ClassLoaderImpl 对象
          *
          * @return ClassLoaderImpl
@@ -347,7 +393,32 @@ public class JdkCompiler extends AbstractCompiler {
             Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
             ClassLoader contextClassLoader = ClassUtils.getDefaultClassLoader();
             List<URL> urlList = new ArrayList<>();
-            return null;
+            // 加载URL目录
+            Enumeration<URL> e = contextClassLoader.getResources("org");
+            while (e.hasMoreElements()) {
+                urlList.add(e.nextElement());
+            }
+
+            ArrayList<JavaFileObject> files = new ArrayList<>();
+            if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
+                for (JavaFileObject file : fileObjects.values()) {
+                    if (file.getKind() == JavaFileObject.Kind.CLASS && file.getName().startsWith(packageName)) {
+                        files.add(file);
+                    }
+                }
+                files.addAll(classLoader.files());
+            } else if (location == StandardLocation.SOURCE_PATH && kinds.contains(JavaFileObject.Kind.SOURCE)) {
+                for (JavaFileObject file : fileObjects.values()) {
+                    if (file.getKind() == JavaFileObject.Kind.SOURCE && file.getName().startsWith(packageName)) {
+                        files.add(file);
+                    }
+                }
+            }
+            for (JavaFileObject file : result) {
+                files.add(file);
+            }
+
+            return files;
         }
 
         /**
