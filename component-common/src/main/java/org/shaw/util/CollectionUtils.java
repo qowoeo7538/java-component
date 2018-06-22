@@ -14,7 +14,7 @@ public class CollectionUtils extends org.springframework.util.CollectionUtils {
      *
      * @param pairs String
      */
-    public static Map<String, String> toStringMap(String... pairs) {
+    public static Map<String, String> toStringMap(final String... pairs) {
         Map<String, String> parameters = new HashMap<>(16);
         if (pairs.length > 0) {
             if (pairs.length % 2 != 0) {

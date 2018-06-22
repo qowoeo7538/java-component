@@ -2,14 +2,17 @@ package org.shaw.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.management.*;
-import java.nio.charset.Charset;
+import java.lang.management.LockInfo;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MonitorInfo;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 
 /**
  * JVM运行时跟踪工具
  */
 public abstract class JvmUtils {
-    public static void jstack(OutputStream stream) throws IOException {
+    public static void jstack(final OutputStream stream) throws IOException {
         // 虚拟机线程系统管理
         ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
         /**
@@ -30,7 +33,7 @@ public abstract class JvmUtils {
      * @param threadInfo {@code ThreadInfo}
      * @return 日志信息
      */
-    private static String getThreadDumpString(ThreadInfo threadInfo) {
+    private static String getThreadDumpString(final ThreadInfo threadInfo) {
         StringBuilder sb = new StringBuilder("\"" + threadInfo.getThreadName() + "\"" +
                 " Id=" + threadInfo.getThreadId() + " " +
                 threadInfo.getThreadState());

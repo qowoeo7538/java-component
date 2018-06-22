@@ -3,6 +3,7 @@ package org.shaw.core.extension;
 import org.shaw.compiler.Compiler;
 import org.shaw.core.Constants;
 import org.shaw.core.extension.support.ActivateComparator;
+import org.shaw.util.ClassUtils;
 import org.shaw.util.ConcurrentHashSet;
 import org.shaw.util.ConfigUtils;
 import org.shaw.util.ExceptionUtils;
@@ -190,7 +191,7 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException(type + " 必须是接口或抽象类!");
         }
         if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException(type + " 不是一个扩展接口, 没有 @" + SPI.class.getSimpleName() + " 注解!");
+            throw new IllegalArgumentException(type + " 不是一个SPI接口类, 没有 @" + SPI.class.getSimpleName() + " 注解!");
         }
         // 尝试获取该 type 的 ExtensionLoader 对象
         ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
@@ -209,17 +210,14 @@ public class ExtensionLoader<T> {
      * @see #getExtensionClasses()
      */
     public void addExtension(String name, Class<?> clazz) {
-        // 根据配置文件加载
         getExtensionClasses();
-        // 判断是否是SPI接口的实现类
-        if (!type.isAssignableFrom(clazz)) {
-            throw new IllegalStateException("Input type " +
-                    clazz + "not implement Extension " + type);
+        if (!ClassUtils.isAssignable(type, clazz)) {
+            throw new IllegalStateException("输入类型 " +
+                    clazz + " 没有实现 " + type);
         }
-        // 判断是否是接口
-        if (clazz.isInterface()) {
-            throw new IllegalStateException("Input type " +
-                    clazz + "can not be interface!");
+        if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+            throw new IllegalStateException("输入类型 " +
+                    clazz + " 不能是接口或抽象类!");
         }
         if (!clazz.isAnnotationPresent(Adaptive.class)) {
             if (StringUtils.isEmpty(name)) {
@@ -812,7 +810,7 @@ public class ExtensionLoader<T> {
      * @throws NoSuchMethodException
      */
     private void loadClass(final Map<String, Class<?>> extensionClasses, final URL resourceURL, final Class<?> clazz, String name) throws NoSuchMethodException {
-        if (!type.isAssignableFrom(clazz)) {
+        if (!ClassUtils.isAssignable(type, clazz)) {
             throw new IllegalStateException("Error when load extension class(interface: " +
                     type + ", class line: " + clazz.getName() + "), class "
                     + clazz.getName() + "is not subtype of interface.");

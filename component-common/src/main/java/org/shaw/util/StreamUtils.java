@@ -28,7 +28,7 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
      * @param readProcess 处理对象
      * @throws IOException
      */
-    public static void channelRead(ScatteringByteChannel channel, ReadProcess readProcess) throws IOException {
+    public static void channelRead(final ScatteringByteChannel channel, final ReadProcess readProcess) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(4096);
         while (channel.read(buffer) > 0) {
             buffer.flip();

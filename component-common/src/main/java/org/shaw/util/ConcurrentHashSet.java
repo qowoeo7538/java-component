@@ -8,8 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @create: 2018-03-06
- * @description:
+ * 利用 {@code ConcurrentMap} 的 KEY 实现线程安全的 HashSet
  */
 public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E>, Serializable {
 

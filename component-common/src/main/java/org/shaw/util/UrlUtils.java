@@ -11,12 +11,12 @@ import java.util.Map;
  */
 public abstract class UrlUtils {
 
-    public static <T> String getParamsString(Map<String, T> params)
+    public static <T> String getParamsString(final Map<String, T> params)
             throws UnsupportedEncodingException {
         return getParamsString(params, "UTF-8");
     }
 
-    public static <T> String getParamsString(Map<String, T> params, String enc)
+    public static <T> String getParamsString(final Map<String, T> params, final String enc)
             throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         for (Iterator<Map.Entry<String, T>> iterator = params.entrySet().iterator(); iterator.hasNext(); ) {

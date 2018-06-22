@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
  */
 public abstract class ResourceUtils extends org.springframework.util.ResourceUtils {
 
-    public static URI toURI(String location) {
+    public static URI toURI(final String location) {
         try {
             return org.springframework.util.ResourceUtils.toURI(location);
         } catch (URISyntaxException e) {

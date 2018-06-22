@@ -15,7 +15,7 @@ public abstract class ExceptionUtils {
     /**
      * 将 CheckedException 转换为 UncheckedException.
      */
-    public static RuntimeException unchecked(Exception e) {
+    public static RuntimeException unchecked(final Exception e) {
         if (e instanceof RuntimeException) {
             return (RuntimeException) e;
         } else {
@@ -26,7 +26,7 @@ public abstract class ExceptionUtils {
     /**
      * 判断异常是否由某些底层的异常引起.
      */
-    public static boolean isCausedBy(Exception ex, Class<? extends Exception>... causeExceptionClasses) {
+    public static boolean isCausedBy(final Exception ex, final Class<? extends Exception>... causeExceptionClasses) {
         Throwable cause = ex.getCause();
         while (cause != null) {
             for (Class<? extends Exception> causeClass : causeExceptionClasses) {
@@ -46,7 +46,7 @@ public abstract class ExceptionUtils {
      * @return {@code String} 打印信息
      * @see UnsafeStringWriter#mBuffer
      */
-    public static String toString(Throwable e) {
+    public static String toString(final Throwable e) {
         UnsafeStringWriter w = new UnsafeStringWriter();
         // p 本质就是对 {@link UnsafeStringWriter#mBuffer} 操作
         try (PrintWriter p = new PrintWriter(w)) {

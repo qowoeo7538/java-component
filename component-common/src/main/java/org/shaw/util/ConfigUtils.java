@@ -6,7 +6,7 @@ package org.shaw.util;
  */
 public abstract class ConfigUtils {
 
-    public static boolean isEmpty(String value) {
+    public static boolean isEmpty(final String value) {
         return value == null || value.length() == 0
                 || "false".equalsIgnoreCase(value)
                 || "0".equalsIgnoreCase(value)
