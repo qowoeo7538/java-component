@@ -12,17 +12,14 @@ import org.shaw.core.extension.activate.impl.ValueActivateExtImpl;
 import org.shaw.core.extension.ext1.SimpleExt;
 import org.shaw.core.extension.ext1.impl.SimpleExtImpl1;
 import org.shaw.core.extension.ext1.impl.SimpleExtImpl2;
+import org.shaw.core.extension.ext10_abstract.SimpleExt10;
 import org.shaw.core.extension.ext2.Ext2;
 import org.shaw.core.extension.ext6_wrap.WrappedExt;
 import org.shaw.core.extension.ext6_wrap.impl.Ext5Wrapper1;
 import org.shaw.core.extension.ext6_wrap.impl.Ext5Wrapper2;
-import org.shaw.core.extension.ext7.InitErrorExt;
 import org.shaw.core.extension.ext8_add.AddExt1;
 import org.shaw.core.extension.ext8_add.AddExt2;
-import org.shaw.core.extension.ext8_add.impl.AddExt1Impl1;
-import org.shaw.core.extension.ext8_add.impl.AddExt1_ManualAdaptive;
 import org.shaw.core.extension.ext8_add.impl.AddExt1_ManualAdd1;
-import org.shaw.core.extension.ext8_add.impl.AddExt1_ManualAdd2;
 import org.shaw.core.extension.ext8_add.impl.AddExt2_ManualAdaptive;
 import org.shaw.core.extension.ext9_empty.Ext9Empty;
 import org.shaw.core.extension.ext9_empty.impl.Ext9EmptyImpl;
@@ -38,15 +35,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
 
 public class ExtensionLoader_Test {
+
     @Test
     public void test_getDefaultExtension() throws Exception {
 
         SimpleExt ext = ExtensionLoader.getExtensionLoader(SimpleExt.class).getDefaultExtension();
         assertThat(ext, instanceOf(SimpleExtImpl1.class));
+        System.out.println(ext.echo(new ExtURL(), ""));
 
         String name = ExtensionLoader.getExtensionLoader(SimpleExt.class).getDefaultExtensionName();
         assertEquals("impl1", name);
@@ -204,4 +201,15 @@ public class ExtensionLoader_Test {
         Assert.assertTrue(list.get(0).getClass() == ActivateExt1Impl1.class);
         Assert.assertTrue(list.get(1).getClass() == OrderActivateExtImpl1.class);
     }
+
+    @Test
+    public void test_getAbstractExtension() throws Exception {
+        SimpleExt10 ext = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtension();
+        assertThat(ext, instanceOf(SimpleExt10.class));
+        assertEquals("abstract-print\nimpl1-call",ext.print());
+
+        String name = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtensionName();
+        assertEquals("impl1", name);
+    }
+
 }

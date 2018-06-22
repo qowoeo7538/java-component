@@ -186,8 +186,8 @@ public class ExtensionLoader<T> {
         if (type == null) {
             throw new IllegalArgumentException("参数[type]不能为null!");
         }
-        if (!type.isInterface()) {
-            throw new IllegalArgumentException(type + " 不是一个接口类!");
+        if (!(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
+            throw new IllegalArgumentException(type + " 必须是接口或抽象类!");
         }
         if (!withExtensionAnnotation(type)) {
             throw new IllegalArgumentException(type + " 不是一个扩展接口, 没有 @" + SPI.class.getSimpleName() + " 注解!");
