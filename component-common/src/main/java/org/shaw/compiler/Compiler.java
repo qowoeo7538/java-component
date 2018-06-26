@@ -1,6 +1,6 @@
 package org.shaw.compiler;
 
-import org.shaw.core.extension.SPI;
+import org.shaw.extension.SPI;
 
 /**
  * @create: 2018-03-04

@@ -1,0 +1,2 @@
+adaptive=org.shaw.extension.adaptive.impl.HasAdaptiveExtManualAdaptive
+impl=org.shaw.extension.adaptive.impl.HasAdaptiveExtImpl

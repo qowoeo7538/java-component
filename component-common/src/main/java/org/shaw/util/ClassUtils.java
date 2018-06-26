@@ -1,5 +1,7 @@
 package org.shaw.util;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Class 工具类
  */
@@ -13,6 +15,31 @@ public abstract class ClassUtils extends org.springframework.util.ClassUtils {
 
     /** 默认类加载器类名 */
     public static final String APP_CLASSLOADER = "sun.misc.Launcher$AppClassLoader";
+
+    // =====================================
+
+    /** String--> Class 缓存 */
+    public static final ConcurrentHashMap<String, Class> CLASS_CACHE = new ConcurrentHashMap<>();
+
+    /** Class --> String 缓存 */
+    public static final ConcurrentHashMap<Class, String> TYPE_STR_CACHE = new ConcurrentHashMap<>();
+
+
+    public static String getTypeStr(Class clazz) {
+        String str = TYPE_STR_CACHE.get(clazz);
+        if (StringUtils.isEmpty(str)) {
+
+        }
+        return "";
+    }
+
+    public static String[] getTypeStrs(Class[] types) {
+        return null;
+    }
+
+    public static String[] getTypeStrs(Class[] types, boolean javaStyle) {
+        return null;
+    }
 
     /**
      * @param caller class 对象

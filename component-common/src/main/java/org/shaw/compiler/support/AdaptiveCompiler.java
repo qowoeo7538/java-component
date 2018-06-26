@@ -1,8 +1,8 @@
 package org.shaw.compiler.support;
 
 import org.shaw.compiler.Compiler;
-import org.shaw.core.extension.Adaptive;
-import org.shaw.core.extension.ExtensionLoader;
+import org.shaw.extension.Adaptive;
+import org.shaw.extension.ExtensionLoader;
 import org.shaw.util.StringUtils;
 
 /**

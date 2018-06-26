@@ -1,4 +1,0 @@
-group=org.shaw.core.extension.activate.impl.GroupActivateExtImpl
-value=org.shaw.core.extension.activate.impl.ValueActivateExtImpl
-order1=org.shaw.core.extension.activate.impl.OrderActivateExtImpl1
-order2=org.shaw.core.extension.activate.impl.OrderActivateExtImpl2
