@@ -22,7 +22,7 @@ ext {
     moduleProjects = subprojects.findAll {
         !it.name.equals('component-build-script')
     }
-    localRepository = 'D:\\m2\\repository'
+    localRepository = '{user.home}/.m2/repository'
 }
 
 // 所有项目配置
