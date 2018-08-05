@@ -12,6 +12,7 @@ import java.lang.management.ThreadMXBean;
  * JVM运行时跟踪工具
  */
 public abstract class JvmUtils {
+
     public static void jstack(final OutputStream stream) throws IOException {
         // 虚拟机线程系统管理
         ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
