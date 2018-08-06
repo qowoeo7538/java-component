@@ -5,15 +5,17 @@ import org.shaw.task.support.DefaultFuture;
 import org.shaw.task.support.ThrottleSupport;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * StandardThreadExecutor execute执行策略：	优先扩充线程到maxThread，再offer到queue，如果满了就reject
@@ -22,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
+public class StandardThreadExecutor {
 
     /**
      * 核心数量
@@ -66,6 +68,8 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
      */
     private final ConcurrencyThrottleAdapter throttleSupport;
 
+    private final ThreadPoolExecutor executor;
+
     public StandardThreadExecutor() {
         this(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
     }
@@ -87,29 +91,43 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
     }
 
     public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory, final RejectedExecutionHandler rejectedExecutionHandler) {
-        super.setCorePoolSize(corePoolSize);
-        // 最大线程数不能小于核心线程数
-        super.setMaxPoolSize(maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize);
-        super.setKeepAliveSeconds(keepAliveSeconds);
-        super.setThreadFactory(threadFactory);
-        super.setRejectedExecutionHandler(rejectedExecutionHandler);
-        initialize();
+        this.executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize,
+                keepAliveSeconds, TimeUnit.SECONDS, new ExecutorQueue(), threadFactory, rejectedExecutionHandler) {
+            @Override
+            protected void beforeExecute(final Thread t, final Runnable r) {
+                before(t, r);
+            }
 
-        throttleSupport = new ConcurrencyThrottleAdapter();
+            @Override
+            protected void afterExecute(final Runnable r, final Throwable t) {
+                after(r, t);
+            }
+        };
+
+        this.throttleSupport = new ConcurrencyThrottleAdapter();
         // 设置最大并发数 maxPoolSize + queueCapacity
-        throttleSupport.setConcurrencyLimit(maxPoolSize + queueCapacity);
+        this.throttleSupport.setConcurrencyLimit(maxPoolSize + queueCapacity);
     }
 
-    @Override
+    public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
+        Assert.state(this.executor != null, "ThreadPoolTaskExecutor 没有初始化!");
+        return this.executor;
+    }
+
+    protected void before(final Thread t, final Runnable r) {
+    }
+
+    protected void after(final Runnable r, final Throwable t) {
+    }
+
     public void execute(final Runnable task) {
-        throttleSupport.beforeAccess(task);
-        super.execute(new ConcurrencyThrottlingRunnable(task));
+        this.throttleSupport.beforeAccess(task);
+        this.execute(new ConcurrencyThrottlingRunnable(task));
     }
 
-    @Override
     public <T> Future<T> submit(final Callable<T> task) {
-        throttleSupport.beforeAccess(task);
-        return super.submit(new ConcurrencyThrottlingCallable<>(task));
+        this.throttleSupport.beforeAccess(task);
+        return this.executor.submit(new ConcurrencyThrottlingCallable<>(task));
     }
 
     /**
@@ -118,22 +136,15 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
      * @return 如果超出并发设置，则使用默认返回值快速响应
      */
     public <T> Future<T> submit(final Callable<T> task, final T defaultValue) {
-        if (throttleSupport.isLimit()) {
+        if (this.throttleSupport.isLimit()) {
             return new DefaultFuture<>(defaultValue);
         }
-        return super.submit(new ConcurrencyThrottlingCallable<>(task));
+        return this.executor.submit(new ConcurrencyThrottlingCallable<>(task));
     }
 
-    @Override
     public Future<?> submit(final Runnable task) {
-        throttleSupport.beforeAccess(task);
-        return super.submit(new ConcurrencyThrottlingRunnable(task));
-    }
-
-    @Override
-    protected BlockingQueue<Runnable> createQueue(final int queueCapacity) {
-        final ExecutorQueue executorQueue = new ExecutorQueue();
-        return executorQueue;
+        this.throttleSupport.beforeAccess(task);
+        return this.executor.submit(new ConcurrencyThrottlingRunnable(task));
     }
 
     private class ConcurrencyThrottleAdapter extends ThrottleSupport {
@@ -141,13 +152,28 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
         public ConcurrencyThrottleAdapter() {
             super(getThreadPoolExecutor());
         }
+
+        @Override
+        protected void beforeAccess(Runnable task) {
+            super.beforeAccess(task);
+        }
+
+        @Override
+        protected <V> void beforeAccess(Callable<V> task) {
+            super.beforeAccess(task);
+        }
+
+        @Override
+        protected void afterAccess() {
+            super.afterAccess();
+        }
     }
 
     private class ConcurrencyThrottlingRunnable implements Runnable {
 
         private final Runnable target;
 
-        public ConcurrencyThrottlingRunnable(Runnable target) {
+        public ConcurrencyThrottlingRunnable(final Runnable target) {
             this.target = target;
         }
 
@@ -170,7 +196,7 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
 
         private final Callable<V> target;
 
-        public ConcurrencyThrottlingCallable(Callable<V> target) {
+        public ConcurrencyThrottlingCallable(final Callable<V> target) {
             this.target = target;
         }
 
@@ -201,7 +227,7 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
          * @param task {@code Runnable}
          * @return {@code boolean} 是否放入成功
          */
-        public boolean force(Runnable task) {
+        public boolean force(final Runnable task) {
             if (getThreadPoolExecutor().isShutdown()) {
                 throw new RejectedExecutionException("Executor没有运行，不能加入到队列");
             }
@@ -217,7 +243,7 @@ public class StandardThreadExecutor extends ThreadPoolTaskExecutor {
          * @return {@code boolean} 如果为 true，成功添加到队列。
          */
         @Override
-        public boolean offer(Runnable task) {
+        public boolean offer(final Runnable task) {
             // 线程池当前线程数量
             int poolSize = getThreadPoolExecutor().getPoolSize();
 

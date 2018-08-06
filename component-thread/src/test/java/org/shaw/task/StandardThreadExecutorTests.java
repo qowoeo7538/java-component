@@ -19,7 +19,17 @@ public class StandardThreadExecutorTests {
                 new CustomizableThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());*/
 
-        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1);
+        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1) {
+            @Override
+            protected void before(Thread t, Runnable r) {
+                System.out.println("运行：" + r);
+            }
+
+            @Override
+            protected void after(Runnable r, Throwable t) {
+                System.out.println("结束：" + r);
+            }
+        };
 
         Future<String> task1 = null;
         try {
@@ -58,7 +68,7 @@ public class StandardThreadExecutorTests {
         }
 
         try {
-            executor.submit(() -> {
+            executor.execute(() -> {
                 try {
                     System.out.println("测试4----开始");
                     Thread.sleep(10000);

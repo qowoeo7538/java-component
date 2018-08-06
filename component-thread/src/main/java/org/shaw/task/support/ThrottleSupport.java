@@ -18,7 +18,7 @@ public abstract class ThrottleSupport {
     /**
      * 当前线程数量 （{@link ThreadPoolExecutor#getActiveCount()} 返回值并不准确）
      */
-    private final AtomicInteger concurrencyCount;
+    private final AtomicInteger concurrencyCount = new AtomicInteger(0);
 
     /**
      * 线程池
@@ -27,7 +27,20 @@ public abstract class ThrottleSupport {
 
     public ThrottleSupport(final ThreadPoolExecutor executor) {
         this.executor = executor;
-        this.concurrencyCount = new AtomicInteger(0);
+    }
+
+    /**
+     * 添加一个任务时，判断是否超过并发限制
+     *
+     * @return 如果 {@code true} 超过并发限制
+     */
+    public boolean isLimit() {
+        // 入口处控制限流量
+        if (this.concurrencyCount.incrementAndGet() > concurrencyLimit) {
+            this.concurrencyCount.decrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -51,7 +64,7 @@ public abstract class ThrottleSupport {
      *
      * @param task 运行任务
      */
-    public void beforeAccess(final Runnable task) {
+    protected void beforeAccess(final Runnable task) {
         // 入口处控制限流量
         if (this.isLimit()) {
             executor.getRejectedExecutionHandler().rejectedExecution(task, executor);
@@ -63,7 +76,7 @@ public abstract class ThrottleSupport {
      *
      * @param task 运行任务
      */
-    public <V> void beforeAccess(final Callable<V> task) {
+    protected <V> void beforeAccess(final Callable<V> task) {
         // 入口处控制限流量
         if (this.isLimit()) {
             executor.getRejectedExecutionHandler().rejectedExecution(new FutureTask<>(task), executor);
@@ -71,23 +84,9 @@ public abstract class ThrottleSupport {
     }
 
     /**
-     * 添加一个任务，判断是否超过并发限制
-     *
-     * @return 如果 {@code true} 超过并发限制
-     */
-    public boolean isLimit() {
-        // 入口处控制限流量
-        if (this.concurrencyCount.incrementAndGet() > concurrencyLimit) {
-            this.concurrencyCount.decrementAndGet();
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 运行后
      */
-    public void afterAccess() {
+    protected void afterAccess() {
         this.concurrencyCount.decrementAndGet();
     }
 
