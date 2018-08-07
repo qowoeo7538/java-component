@@ -81,9 +81,11 @@ public class StandardThreadExecutor {
      */
     private int awaitTerminationSeconds = 0;
 
-    private BeforeFunction before;
+    private BeforeFunction before = (r, t) -> {
+    };
 
-    private AfterFunction after;
+    private AfterFunction after = (r, t) -> {
+    };
 
     public StandardThreadExecutor() {
         this(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);

@@ -6,9 +6,9 @@ public interface BeforeFunction {
     /**
      * 任务执行之前
      *
-     * @param r 当前任务
-     * @param t 异常信息
+     * @param task   当前任务
+     * @param thread 异常信息
      */
-    void beforeExecute(final Runnable r, final Thread t);
+    void beforeExecute(final Runnable task, final Thread thread);
 
 }
