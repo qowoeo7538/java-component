@@ -61,7 +61,9 @@ public class StandardThreadExecutor {
      */
     private static final int DEFAULT_KEEP_ALIVE_SECONDS = 60;
 
-    /** 线程池限流对象 */
+    /**
+     * 线程池限流对象
+     */
     private final ConcurrencyThrottleAdapter throttleSupport;
 
     private final ThreadPoolExecutor threadPoolExecutor;
@@ -149,6 +151,13 @@ public class StandardThreadExecutor {
     public Future<?> submit(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
+    }
+
+    /**
+     * @return 运行任务数量
+     */
+    public int getTaskCount() {
+        return this.throttleSupport.getConcurrencyCount().get();
     }
 
     private class ConcurrencyThrottleAdapter extends ThrottleSupport {

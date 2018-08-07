@@ -55,8 +55,8 @@ public abstract class ThrottleSupport {
     /**
      * @return 当前任务数量
      */
-    public int getConcurrencyCount() {
-        return this.concurrencyCount.get();
+    public AtomicInteger getConcurrencyCount() {
+        return this.concurrencyCount;
     }
 
     /**
