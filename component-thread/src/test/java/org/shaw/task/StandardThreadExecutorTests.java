@@ -12,24 +12,10 @@ public class StandardThreadExecutorTests {
 
     @Test
     public void TestThreadExecutor() throws Exception {
-        /*ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                1, 1,
-                60, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(1),
-                new CustomizableThreadFactory(),
-                new ThreadPoolExecutor.AbortPolicy());*/
+        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1);
 
-        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1) {
-            @Override
-            protected void before(Thread t, Runnable r) {
-                System.out.println("运行：" + r);
-            }
-
-            @Override
-            protected void after(Runnable r, Throwable t) {
-                System.out.println("结束：" + r);
-            }
-        };
+        executor.setBefore((r, t) -> System.out.println("运行任务：" + r));
+        executor.setAfter(((r, t) -> System.out.println("任务结束：" + r)));
 
         Future<String> task1 = null;
         try {

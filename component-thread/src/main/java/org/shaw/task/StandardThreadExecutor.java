@@ -1,6 +1,9 @@
 package org.shaw.task;
 
+import org.shaw.core.Constants;
 import org.shaw.task.support.AbortPolicyWithReport;
+import org.shaw.task.support.AfterFunction;
+import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
 import org.shaw.task.support.ThrottleSupport;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -27,11 +30,6 @@ import java.util.concurrent.TimeUnit;
 public class StandardThreadExecutor {
 
     /**
-     * 核心数量
-     */
-    public static final int CORE_SIZE = Runtime.getRuntime().availableProcessors();
-
-    /**
      * 核心线程池大小
      * <p>
      * 当线程池小于corePoolSize时，新提交任务将创建一个新线程执行任务，
@@ -43,7 +41,7 @@ public class StandardThreadExecutor {
      *
      * @see ThreadPoolTaskExecutor#corePoolSize
      */
-    private static final int DEFAULT_CORE_POOL_SIZE = CORE_SIZE + 1;
+    private static final int DEFAULT_CORE_POOL_SIZE = Constants.CORE_SIZE + 1;
 
     /**
      * 最大线程池大小
@@ -55,7 +53,7 @@ public class StandardThreadExecutor {
      *
      * @see ThreadPoolTaskExecutor#maxPoolSize
      */
-    private static final int DEFAULT_MAX_POOL_SIZE = 2 * CORE_SIZE + 1;
+    private static final int DEFAULT_MAX_POOL_SIZE = 2 * Constants.CORE_SIZE + 1;
 
     /**
      * 线程池中超过核心线程数目的空闲线程最大存活时间；
@@ -69,6 +67,12 @@ public class StandardThreadExecutor {
     private final ConcurrencyThrottleAdapter throttleSupport;
 
     private final ThreadPoolExecutor executor;
+
+    //======================================
+
+    private BeforeFunction before;
+
+    private AfterFunction after;
 
     public StandardThreadExecutor() {
         this(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
@@ -95,12 +99,12 @@ public class StandardThreadExecutor {
                 keepAliveSeconds, TimeUnit.SECONDS, new ExecutorQueue(), threadFactory, rejectedExecutionHandler) {
             @Override
             protected void beforeExecute(final Thread t, final Runnable r) {
-                before(t, r);
+                before.beforeExecute(r, t);
             }
 
             @Override
             protected void afterExecute(final Runnable r, final Throwable t) {
-                after(r, t);
+                after.afterExecute(r, t);
             }
         };
 
@@ -114,10 +118,12 @@ public class StandardThreadExecutor {
         return this.executor;
     }
 
-    protected void before(final Thread t, final Runnable r) {
+    public void setBefore(BeforeFunction before) {
+        this.before = before;
     }
 
-    protected void after(final Runnable r, final Throwable t) {
+    public void setAfter(AfterFunction after) {
+        this.after = after;
     }
 
     public void execute(final Runnable task) {

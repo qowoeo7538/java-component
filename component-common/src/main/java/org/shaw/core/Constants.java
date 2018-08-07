@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
  */
 public abstract class Constants {
 
+    /** 核心数量 */
+    public static final int CORE_SIZE = Runtime.getRuntime().availableProcessors();
+
     public static final String TRUE = "true";
 
     /** 默认组别名 */
