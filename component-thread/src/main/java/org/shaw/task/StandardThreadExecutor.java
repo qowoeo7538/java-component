@@ -61,12 +61,10 @@ public class StandardThreadExecutor {
      */
     private static final int DEFAULT_KEEP_ALIVE_SECONDS = 60;
 
-    /**
-     * 线程池限流对象
-     */
+    /** 线程池限流对象 */
     private final ConcurrencyThrottleAdapter throttleSupport;
 
-    private final ThreadPoolExecutor executor;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     //======================================
 
@@ -95,7 +93,7 @@ public class StandardThreadExecutor {
     }
 
     public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory, final RejectedExecutionHandler rejectedExecutionHandler) {
-        this.executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize,
+        this.threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize,
                 keepAliveSeconds, TimeUnit.SECONDS, new ExecutorQueue(), threadFactory, rejectedExecutionHandler) {
             @Override
             protected void beforeExecute(final Thread t, final Runnable r) {
@@ -114,15 +112,15 @@ public class StandardThreadExecutor {
     }
 
     public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
-        Assert.state(this.executor != null, "ThreadPoolExecutor 没有初始化!");
-        return this.executor;
+        Assert.state(this.threadPoolExecutor != null, "ThreadPoolExecutor 没有初始化!");
+        return this.threadPoolExecutor;
     }
 
-    public void setBefore(BeforeFunction before) {
+    public void setBefore(final BeforeFunction before) {
         this.before = before;
     }
 
-    public void setAfter(AfterFunction after) {
+    public void setAfter(final AfterFunction after) {
         this.after = after;
     }
 
@@ -133,7 +131,7 @@ public class StandardThreadExecutor {
 
     public <T> Future<T> submit(final Callable<T> task) {
         this.throttleSupport.beforeAccess(task);
-        return this.executor.submit(new ConcurrencyThrottlingCallable<>(task));
+        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
     }
 
     /**
@@ -145,12 +143,12 @@ public class StandardThreadExecutor {
         if (this.throttleSupport.isLimit()) {
             return new DefaultFuture<>(defaultValue);
         }
-        return this.executor.submit(new ConcurrencyThrottlingCallable<>(task));
+        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
     }
 
     public Future<?> submit(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
-        return this.executor.submit(new ConcurrencyThrottlingRunnable(task));
+        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
     }
 
     private class ConcurrencyThrottleAdapter extends ThrottleSupport {
@@ -160,12 +158,12 @@ public class StandardThreadExecutor {
         }
 
         @Override
-        protected void beforeAccess(Runnable task) {
+        protected void beforeAccess(final Runnable task) {
             super.beforeAccess(task);
         }
 
         @Override
-        protected <V> void beforeAccess(Callable<V> task) {
+        protected <V> void beforeAccess(final Callable<V> task) {
             super.beforeAccess(task);
         }
 
