@@ -5,7 +5,6 @@ import org.shaw.task.support.AbortPolicyWithReport;
 import org.shaw.task.support.AfterFunction;
 import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
-import org.shaw.task.support.ExecutorConfigurationSupport;
 import org.shaw.task.support.ThrottleSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
@@ -29,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class StandardThreadExecutor extends ExecutorConfigurationSupport {
+public class StandardThreadExecutor {
 
     /**
      * 核心线程池大小
@@ -71,6 +70,16 @@ public class StandardThreadExecutor extends ExecutorConfigurationSupport {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     //======================================
+
+    /**
+     * 是否需要对线程池中子线程进行立即关闭
+     */
+    private boolean waitForTasksToCompleteOnShutdown = false;
+
+    /**
+     * 线程池超时关闭时间
+     */
+    private int awaitTerminationSeconds = 0;
 
     private BeforeFunction before;
 
@@ -115,9 +124,20 @@ public class StandardThreadExecutor extends ExecutorConfigurationSupport {
         this.throttleSupport.setConcurrencyLimit(maxPoolSize + queueCapacity);
     }
 
+    public void setWaitForTasksToCompleteOnShutdown(final boolean waitForJobsToCompleteOnShutdown) {
+        this.waitForTasksToCompleteOnShutdown = waitForJobsToCompleteOnShutdown;
+    }
+
     public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
         Assert.state(this.threadPoolExecutor != null, "ThreadPoolExecutor 没有初始化!");
         return this.threadPoolExecutor;
+    }
+
+    /**
+     * @return 运行任务数量
+     */
+    public int getTaskCount() {
+        return this.throttleSupport.getConcurrencyCount().get();
     }
 
     public void setBefore(final BeforeFunction before) {
@@ -155,16 +175,42 @@ public class StandardThreadExecutor extends ExecutorConfigurationSupport {
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
     }
 
-    /**
-     * @return 运行任务数量
-     */
-    public int getTaskCount() {
-        return this.throttleSupport.getConcurrencyCount().get();
+    public void destroy() {
+        if (this.threadPoolExecutor != null) {
+            if (this.waitForTasksToCompleteOnShutdown) {
+                this.threadPoolExecutor.shutdown();
+            } else {
+                for (Runnable remainingTask : this.threadPoolExecutor.shutdownNow()) {
+                    cancelRemainingTask(remainingTask);
+                }
+            }
+            awaitTerminationIfNecessary(this.threadPoolExecutor);
+        }
     }
 
-    @Override
-    protected ExecutorService getExecutor() {
-        return getThreadPoolExecutor();
+    /**
+     * 尝试取消剩下的 {@code Future} 任务
+     *
+     * @param task 任务
+     */
+    private void cancelRemainingTask(final Runnable task) {
+        if (task instanceof Future) {
+            // 尝试取消任务，如果任务已经启动，通过 mayInterruptIfRunning 参数来终止该任务。
+            ((Future<?>) task).cancel(true);
+        }
+    }
+
+    private void awaitTerminationIfNecessary(final ExecutorService executor) {
+        if (this.awaitTerminationSeconds > 0) {
+            try {
+                if (!executor.awaitTermination(this.awaitTerminationSeconds, TimeUnit.SECONDS)) {
+                    // TODO 日志记录
+                }
+            } catch (final InterruptedException ex) {
+                // TODO 日志记录
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     private class ConcurrencyThrottleAdapter extends ThrottleSupport {
