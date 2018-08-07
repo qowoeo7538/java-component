@@ -5,13 +5,15 @@ import org.shaw.task.support.AbortPolicyWithReport;
 import org.shaw.task.support.AfterFunction;
 import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
+import org.shaw.task.support.ExecutorConfigurationSupport;
 import org.shaw.task.support.ThrottleSupport;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -27,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class StandardThreadExecutor {
+public class StandardThreadExecutor extends ExecutorConfigurationSupport {
 
     /**
      * 核心线程池大小
@@ -87,7 +89,7 @@ public class StandardThreadExecutor {
     }
 
     public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity) {
-        this(corePoolSize, maxPoolSize, keepAliveSeconds, queueCapacity, new CustomizableThreadFactory());
+        this(corePoolSize, maxPoolSize, keepAliveSeconds, queueCapacity, Executors.defaultThreadFactory());
     }
 
     public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory) {
@@ -158,6 +160,11 @@ public class StandardThreadExecutor {
      */
     public int getTaskCount() {
         return this.throttleSupport.getConcurrencyCount().get();
+    }
+
+    @Override
+    protected ExecutorService getExecutor() {
+        return getThreadPoolExecutor();
     }
 
     private class ConcurrencyThrottleAdapter extends ThrottleSupport {
