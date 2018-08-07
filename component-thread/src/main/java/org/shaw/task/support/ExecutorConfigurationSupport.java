@@ -31,7 +31,7 @@ public abstract class ExecutorConfigurationSupport {
         }
     }
 
-    public void setWaitForTasksToCompleteOnShutdown(boolean waitForJobsToCompleteOnShutdown) {
+    public void setWaitForTasksToCompleteOnShutdown(final boolean waitForJobsToCompleteOnShutdown) {
         this.waitForTasksToCompleteOnShutdown = waitForJobsToCompleteOnShutdown;
     }
 
@@ -40,7 +40,7 @@ public abstract class ExecutorConfigurationSupport {
      *
      * @param task 任务
      */
-    protected void cancelRemainingTask(Runnable task) {
+    protected void cancelRemainingTask(final Runnable task) {
         if (task instanceof Future) {
             // 尝试取消任务，如果任务已经启动，通过 mayInterruptIfRunning 参数来终止该任务。
             ((Future<?>) task).cancel(true);
@@ -52,13 +52,13 @@ public abstract class ExecutorConfigurationSupport {
      */
     protected abstract ExecutorService getExecutor();
 
-    private void awaitTerminationIfNecessary(ExecutorService executor) {
+    private void awaitTerminationIfNecessary(final ExecutorService executor) {
         if (this.awaitTerminationSeconds > 0) {
             try {
                 if (!executor.awaitTermination(this.awaitTerminationSeconds, TimeUnit.SECONDS)) {
                     // TODO 日志记录
                 }
-            } catch (InterruptedException ex) {
+            } catch (final InterruptedException ex) {
                 // TODO 日志记录
                 Thread.currentThread().interrupt();
             }
