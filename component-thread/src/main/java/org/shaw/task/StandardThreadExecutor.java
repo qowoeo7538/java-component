@@ -110,7 +110,7 @@ public class StandardThreadExecutor {
     }
 
     public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
-        Assert.state(this.executor != null, "ThreadPoolTaskExecutor 没有初始化!");
+        Assert.state(this.executor != null, "ThreadPoolExecutor 没有初始化!");
         return this.executor;
     }
 
