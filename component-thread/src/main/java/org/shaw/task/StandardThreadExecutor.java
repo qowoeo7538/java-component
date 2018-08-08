@@ -8,6 +8,8 @@ import org.shaw.task.support.DefaultFuture;
 import org.shaw.task.support.ThrottleSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureTask;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
@@ -175,6 +177,20 @@ public class StandardThreadExecutor {
     public Future<?> submit(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
+    }
+
+    public ListenableFuture<?> submitListenable(Runnable task) {
+        ListenableFutureTask<Object> future = new ListenableFutureTask<>(new ConcurrencyThrottlingRunnable(task), null);
+        this.throttleSupport.beforeAccess(future);
+        this.threadPoolExecutor.execute(future);
+        return future;
+    }
+
+    public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
+        ListenableFutureTask<T> future = new ListenableFutureTask<>(new ConcurrencyThrottlingCallable<>(task));
+        this.throttleSupport.beforeAccess(future);
+        this.threadPoolExecutor.execute(future);
+        return future;
     }
 
     public void destroy() {
