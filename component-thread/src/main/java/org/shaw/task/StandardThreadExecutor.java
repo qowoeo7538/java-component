@@ -13,6 +13,7 @@ import org.springframework.util.concurrent.ListenableFutureTask;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class StandardThreadExecutor {
+public class StandardThreadExecutor implements Executor {
 
     /**
      * 核心线程池大小
@@ -152,6 +153,7 @@ public class StandardThreadExecutor {
         this.after = after;
     }
 
+    @Override
     public void execute(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
         this.execute(new ConcurrencyThrottlingRunnable(task));
