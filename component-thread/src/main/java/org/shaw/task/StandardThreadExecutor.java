@@ -5,6 +5,7 @@ import org.shaw.task.support.AbortPolicyWithReport;
 import org.shaw.task.support.AfterFunction;
 import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
+import org.shaw.task.support.ThrottleSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -16,14 +17,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * StandardThreadExecutor execute执行策略：	优先扩充线程到maxThread，再offer到queue，如果满了就reject
@@ -69,7 +68,7 @@ public class StandardThreadExecutor implements Executor {
     /**
      * 线程池限流对象
      */
-    private final ConcurrencyThrottleSupport throttleSupport;
+    private final ConcurrencyThrottleAdapter throttleSupport;
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
@@ -125,7 +124,7 @@ public class StandardThreadExecutor implements Executor {
             }
         };
 
-        this.throttleSupport = new ConcurrencyThrottleSupport(threadPoolExecutor);
+        this.throttleSupport = new ConcurrencyThrottleAdapter();
         // 设置最大并发数 maxPoolSize + queueCapacity
         this.throttleSupport.setConcurrencyLimit(maxPoolSize + queueCapacity);
     }
@@ -234,91 +233,25 @@ public class StandardThreadExecutor implements Executor {
         }
     }
 
-    /**
-     * @see org.springframework.util.ConcurrencyThrottleSupport
-     */
-    private class ConcurrencyThrottleSupport {
+    private class ConcurrencyThrottleAdapter extends ThrottleSupport {
 
-        /**
-         * 线程池
-         */
-        private final ThreadPoolExecutor executor;
-
-        /**
-         * 并发量设置
-         */
-        private int concurrencyLimit;
-
-        /**
-         * 当前线程数量 （{@link ThreadPoolExecutor#getActiveCount()} 返回值并不准确）
-         */
-        private final AtomicInteger concurrencyCount = new AtomicInteger(0);
-
-        public ConcurrencyThrottleSupport(final ThreadPoolExecutor executor) {
-            this.executor = executor;
+        public ConcurrencyThrottleAdapter() {
+            super(getThreadPoolExecutor());
         }
 
-        /**
-         * 添加一个任务时，判断是否超过并发限制
-         *
-         * @return 如果 {@code true} 超过并发限制
-         */
-        public boolean isLimit() {
-            // 入口处控制限流量
-            if (this.concurrencyCount.incrementAndGet() > concurrencyLimit) {
-                this.concurrencyCount.decrementAndGet();
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * 设置最大并发
-         *
-         * @param concurrencyLimit
-         */
-        public void setConcurrencyLimit(final int concurrencyLimit) {
-            this.concurrencyLimit = concurrencyLimit;
-        }
-
-        /**
-         * @return 当前任务数量
-         */
-        public AtomicInteger getConcurrencyCount() {
-            return this.concurrencyCount;
-        }
-
-        /**
-         * 运行前
-         *
-         * @param task 运行任务
-         */
+        @Override
         protected void beforeAccess(final Runnable task) {
-            // 入口处控制限流量
-            if (this.concurrencyCount.incrementAndGet() > concurrencyLimit) {
-                this.concurrencyCount.decrementAndGet();
-                executor.getRejectedExecutionHandler().rejectedExecution(task, executor);
-            }
+            super.beforeAccess(task);
         }
 
-        /**
-         * 运行前
-         *
-         * @param task 运行任务
-         */
+        @Override
         protected <V> void beforeAccess(final Callable<V> task) {
-            // 入口处控制限流量
-            if (this.concurrencyCount.incrementAndGet() > concurrencyLimit) {
-                this.concurrencyCount.decrementAndGet();
-                executor.getRejectedExecutionHandler().rejectedExecution(new FutureTask<>(task), executor);
-            }
+            super.beforeAccess(task);
         }
 
-        /**
-         * 运行后
-         */
+        @Override
         protected void afterAccess() {
-            this.concurrencyCount.decrementAndGet();
+            super.afterAccess();
         }
     }
 
