@@ -156,7 +156,7 @@ public class StandardThreadExecutor implements Executor {
     @Override
     public void execute(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
-        this.execute(new ConcurrencyThrottlingRunnable(task));
+        this.threadPoolExecutor.execute(new ConcurrencyThrottlingRunnable(task));
     }
 
     public <T> Future<T> submit(final Callable<T> task) {
@@ -181,15 +181,15 @@ public class StandardThreadExecutor implements Executor {
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
     }
 
-    public ListenableFuture<?> submitListenable(Runnable task) {
-        ListenableFutureTask<Object> future = new ListenableFutureTask<>(new ConcurrencyThrottlingRunnable(task), null);
+    public ListenableFuture<?> submitListenable(final Runnable task) {
+        final ListenableFutureTask<Object> future = new ListenableFutureTask<>(new ConcurrencyThrottlingRunnable(task), null);
         this.throttleSupport.beforeAccess(future);
         this.threadPoolExecutor.execute(future);
         return future;
     }
 
-    public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
-        ListenableFutureTask<T> future = new ListenableFutureTask<>(new ConcurrencyThrottlingCallable<>(task));
+    public <T> ListenableFuture<T> submitListenable(final Callable<T> task) {
+        final ListenableFutureTask<T> future = new ListenableFutureTask<>(new ConcurrencyThrottlingCallable<>(task));
         this.throttleSupport.beforeAccess(future);
         this.threadPoolExecutor.execute(future);
         return future;
