@@ -6,7 +6,6 @@ import org.shaw.task.support.AfterFunction;
 import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
 import org.shaw.task.support.ThrottleSupport;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
@@ -25,13 +24,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * StandardThreadExecutor execute执行策略：	优先扩充线程到maxThread，再offer到queue，如果满了就reject
+ * StandardThreadExecutor
+ * 执行策略：	优先扩充线程到maxThread，再offer到queue，如果满了就reject
+ * 适应场景： 适用于低于CPU运行效率的业务
  * <p>
- * 适应场景：  适用于低于CPU运行效率的业务
+ * ThreadPoolTaskExecutor
+ * 执行策略：	优先将任务offer到queue，再扩充线程到maxThread，如果满了就reject
+ * 适应场景： 高效率任务
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class StandardThreadExecutor implements Executor {
+public class ThreadPoolTaskExecutor implements Executor {
 
     /**
      * 核心线程池大小
@@ -43,7 +46,7 @@ public class StandardThreadExecutor implements Executor {
      * <p>
      * 默认CPU密集型应用数量
      *
-     * @see ThreadPoolTaskExecutor#corePoolSize
+     * @see org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor#corePoolSize
      */
     private static final int DEFAULT_CORE_POOL_SIZE = Constants.CORE_SIZE + 1;
 
@@ -55,7 +58,7 @@ public class StandardThreadExecutor implements Executor {
      * <p>
      * 默认IO密集型应用数量
      *
-     * @see ThreadPoolTaskExecutor#maxPoolSize
+     * @see org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor#maxPoolSize
      */
     private static final int DEFAULT_MAX_POOL_SIZE = 2 * Constants.CORE_SIZE + 1;
 
@@ -90,27 +93,27 @@ public class StandardThreadExecutor implements Executor {
     private AfterFunction after = (r, t) -> {
     };
 
-    public StandardThreadExecutor() {
+    public ThreadPoolTaskExecutor() {
         this(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
     }
 
-    public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize) {
+    public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize) {
         this(corePoolSize, maxPoolSize, DEFAULT_KEEP_ALIVE_SECONDS);
     }
 
-    public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds) {
+    public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds) {
         this(corePoolSize, maxPoolSize, keepAliveSeconds, maxPoolSize);
     }
 
-    public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity) {
+    public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity) {
         this(corePoolSize, maxPoolSize, keepAliveSeconds, queueCapacity, Executors.defaultThreadFactory());
     }
 
-    public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory) {
+    public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory) {
         this(corePoolSize, maxPoolSize, keepAliveSeconds, queueCapacity, threadFactory, new AbortPolicyWithReport());
     }
 
-    public StandardThreadExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory, final RejectedExecutionHandler rejectedExecutionHandler) {
+    public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory, final RejectedExecutionHandler rejectedExecutionHandler) {
         this.threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize,
                 keepAliveSeconds, TimeUnit.SECONDS, new ExecutorQueue(), threadFactory, rejectedExecutionHandler) {
             @Override
@@ -318,26 +321,6 @@ public class StandardThreadExecutor implements Executor {
                 throw new RejectedExecutionException("Executor没有运行，不能加入到队列");
             }
             return offer(task);
-        }
-
-        /**
-         * 优先扩充线程到maxThread，
-         * <p>
-         * 返回 false 线程池将尝试扩充到最大线程个数，如果满载，则使用拒绝策略。
-         *
-         * @param task {@code Runnable} 任务
-         * @return {@code boolean} 如果为 true，成功添加到队列。
-         */
-        @Override
-        public boolean offer(final Runnable task) {
-            // 线程池当前线程数量
-            int poolSize = getThreadPoolExecutor().getPoolSize();
-
-            if (poolSize < getThreadPoolExecutor().getMaximumPoolSize()) {
-                // 当前线程数量小于最大线程数量，不加入队列。
-                return false;
-            }
-            return super.offer(task);
         }
     }
 }
