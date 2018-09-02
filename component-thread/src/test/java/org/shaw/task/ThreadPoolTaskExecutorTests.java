@@ -1,18 +1,27 @@
 package org.shaw.task;
 
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.junit.Test;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
+import java.security.SecureRandom;
+import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @create: 2017-12-26
  * @description:
  */
-public class StandardThreadExecutorTests {
+public class ThreadPoolTaskExecutorTests {
 
     @Test
     public void TestThreadExecutor() throws Exception {
-        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor(1, 1);
 
         executor.setBefore((r, t) -> System.out.println("运行任务：" + r));
         executor.setAfter(((r, t) -> System.out.println("任务结束：" + r)));
@@ -105,7 +114,7 @@ public class StandardThreadExecutorTests {
 
     @Test
     public void TestListenableFuture() throws Exception {
-        StandardThreadExecutor executor = new StandardThreadExecutor(1, 1);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor(1, 1);
 
         executor.setBefore((r, t) -> System.out.println("运行任务：" + r));
         executor.setAfter(((r, t) -> System.out.println("任务结束：" + r)));
@@ -196,4 +205,22 @@ public class StandardThreadExecutorTests {
         System.out.println("==================");
     }
 
+    public static void main(String[] args) throws Exception {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                8, 16, 60, TimeUnit.SECONDS,
+                new SynchronousQueue<>(), new CustomizableThreadFactory(),
+                new ThreadPoolExecutor.AbortPolicy());
+        Random random = new SecureRandom();
+        MutableList<Callable<String>> cables = new FastList<>();
+        for (int i = 0, size = 10; i < size; i++) {
+            final int value = i;
+            cables.add(() -> {
+                TimeUnit.SECONDS.sleep(random.nextInt(10));
+                return value + "\n";
+            });
+        }
+
+        String value = executor.invokeAny(cables);
+        System.out.println(value);
+    }
 }

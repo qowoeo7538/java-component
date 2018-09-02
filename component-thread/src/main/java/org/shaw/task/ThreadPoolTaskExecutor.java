@@ -1,27 +1,38 @@
 package org.shaw.task;
 
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.shaw.core.Constants;
 import org.shaw.task.support.AbortPolicyWithReport;
 import org.shaw.task.support.AfterFunction;
 import org.shaw.task.support.BeforeFunction;
 import org.shaw.task.support.DefaultFuture;
+import org.shaw.task.support.ExecutorCompletionService;
+import org.shaw.task.support.TaskExecutionException;
 import org.shaw.task.support.ThrottleSupport;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * StandardThreadExecutor
@@ -34,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 建议线程数目 = （（线程等待时间+线程处理时间）/线程处理时间 ）* CPU数目
  */
-public class ThreadPoolTaskExecutor implements Executor {
+public class ThreadPoolTaskExecutor extends AbstractExecutorService {
 
     /**
      * 核心线程池大小
@@ -76,11 +87,6 @@ public class ThreadPoolTaskExecutor implements Executor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     //======================================
-
-    /**
-     * 是否需要对线程池中子线程进行立即关闭
-     */
-    private boolean waitForTasksToCompleteOnShutdown = false;
 
     /**
      * 线程池超时关闭时间
@@ -132,10 +138,6 @@ public class ThreadPoolTaskExecutor implements Executor {
         this.throttleSupport.setConcurrencyLimit(maxPoolSize + queueCapacity);
     }
 
-    public void setWaitForTasksToCompleteOnShutdown(final boolean waitForJobsToCompleteOnShutdown) {
-        this.waitForTasksToCompleteOnShutdown = waitForJobsToCompleteOnShutdown;
-    }
-
     public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
         Assert.state(this.threadPoolExecutor != null, "ThreadPoolExecutor 没有初始化!");
         return this.threadPoolExecutor;
@@ -162,6 +164,7 @@ public class ThreadPoolTaskExecutor implements Executor {
         this.threadPoolExecutor.execute(new ConcurrencyThrottlingRunnable(task));
     }
 
+    @Override
     public <T> Future<T> submit(final Callable<T> task) {
         this.throttleSupport.beforeAccess(task);
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
@@ -179,9 +182,16 @@ public class ThreadPoolTaskExecutor implements Executor {
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
     }
 
+    @Override
     public Future<?> submit(final Runnable task) {
         this.throttleSupport.beforeAccess(task);
         return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
+    }
+
+    @Override
+    public <T> Future<T> submit(final Runnable task, final T result) {
+        this.throttleSupport.beforeAccess(task);
+        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task), result);
     }
 
     public ListenableFuture<?> submitListenable(final Runnable task) {
@@ -198,16 +208,193 @@ public class ThreadPoolTaskExecutor implements Executor {
         return future;
     }
 
-    public void destroy() {
-        if (this.threadPoolExecutor != null) {
-            if (this.waitForTasksToCompleteOnShutdown) {
-                this.threadPoolExecutor.shutdown();
-            } else {
-                for (Runnable remainingTask : this.threadPoolExecutor.shutdownNow()) {
-                    cancelRemainingTask(remainingTask);
+    @Override
+    public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks)
+            throws InterruptedException {
+        final MutableList<Future<T>> futures = new FastList<>();
+        boolean done = false;
+        try {
+            for (Iterator<? extends Callable<T>> iterator = tasks.iterator(); iterator.hasNext(); ) {
+                Callable<T> callable = iterator.next();
+                this.throttleSupport.beforeAccess(callable);
+                futures.add(this.submit(callable));
+            }
+            for (int i = 0, size = futures.size(); i < size; i++) {
+                Future<T> f = futures.get(i);
+                if (!f.isDone()) {
+                    try {
+                        f.get();
+                    } catch (CancellationException ignore) {
+                    } catch (ExecutionException ignore) {
+                    }
                 }
             }
-            awaitTerminationIfNecessary(this.threadPoolExecutor);
+            done = true;
+        } finally {
+            if (!done) {
+                for (int i = 0, size = futures.size(); i < size; i++) {
+                    futures.get(i).cancel(true);
+                }
+            }
+        }
+        return futures;
+    }
+
+    @Override
+    public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks,
+                                         final long timeout, final TimeUnit unit)
+            throws InterruptedException {
+        long nanos = unit.toNanos(timeout);
+        final MutableList<Future<T>> futures = new FastList<>();
+        for (Callable<T> callable : tasks) {
+            futures.add(new FutureTask<>(callable));
+        }
+        final long deadline = System.nanoTime() + nanos;
+        final int size = futures.size();
+        boolean done = false;
+        try {
+            for (int i = 0; i < size; i++) {
+                this.execute((Runnable) futures.get(i));
+                nanos = deadline - System.nanoTime();
+                if (nanos <= 0L) {
+                    return futures;
+                }
+            }
+
+            for (int i = 0; i < size; i++) {
+                Future<T> f = futures.get(i);
+                if (!f.isDone()) {
+                    if (nanos <= 0L) {
+                        return futures;
+                    }
+                    try {
+                        f.get(nanos, TimeUnit.NANOSECONDS);
+                    } catch (CancellationException ignore) {
+                    } catch (ExecutionException ignore) {
+                    } catch (TimeoutException toe) {
+                        return futures;
+                    }
+                    nanos = deadline - System.nanoTime();
+                }
+            }
+            done = true;
+        } finally {
+            if (!done) {
+                for (int i = 0; i < size; i++) {
+                    futures.get(i).cancel(true);
+                }
+            }
+        }
+        return futures;
+    }
+
+    @Override
+    public <T> T invokeAny(final Collection<? extends Callable<T>> tasks)
+            throws InterruptedException, ExecutionException {
+        try {
+            return doInvokeAny(tasks, false, 0);
+        } catch (TimeoutException cannotHappen) {
+            return null;
+        }
+    }
+
+    @Override
+    public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return doInvokeAny(tasks, true, unit.toNanos(timeout));
+    }
+
+    @Override
+    public void shutdown() {
+        this.threadPoolExecutor.shutdown();
+        awaitTerminationIfNecessary(this.threadPoolExecutor);
+    }
+
+    @Override
+    public List<Runnable> shutdownNow() {
+        List<Runnable> list = this.threadPoolExecutor.shutdownNow();
+        for (Runnable remainingTask : list) {
+            cancelRemainingTask(remainingTask);
+        }
+        awaitTerminationIfNecessary(this.threadPoolExecutor);
+        return list;
+    }
+
+    @Override
+    public boolean isShutdown() {
+        return this.threadPoolExecutor.isShutdown();
+    }
+
+    @Override
+    public boolean isTerminated() {
+        return this.threadPoolExecutor.isTerminated();
+    }
+
+    @Override
+    public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
+        return this.threadPoolExecutor.awaitTermination(timeout, unit);
+    }
+
+    private <T> T doInvokeAny(Collection<? extends Callable<T>> tasks,
+                              boolean timed, long nanos)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        if (tasks == null) {
+            throw new NullPointerException();
+        }
+        int ntasks = tasks.size();
+        if (ntasks == 0) {
+            throw new IllegalArgumentException();
+        }
+        MutableList<Future<T>> futures = new FastList<>(ntasks);
+        ExecutorCompletionService<T> ecs = new ExecutorCompletionService<>(this, throttleSupport);
+
+        try {
+            ExecutionException ee = null;
+            final long deadline = timed ? System.nanoTime() + nanos : 0L;
+            Iterator<? extends Callable<T>> it = tasks.iterator();
+
+            futures.add(ecs.submit(it.next()));
+            --ntasks;
+            int active = 1;
+
+            for (; ; ) {
+                Future<T> f = ecs.poll();
+                if (f == null) {
+                    if (ntasks > 0) {
+                        --ntasks;
+                        futures.add(ecs.submit(it.next()));
+                        ++active;
+                    } else if (active == 0) {
+                        break;
+                    } else if (timed) {
+                        f = ecs.poll(nanos, TimeUnit.NANOSECONDS);
+                        if (f == null) {
+                            throw new TimeoutException();
+                        }
+
+                        nanos = deadline - System.nanoTime();
+                    } else {
+                        f = ecs.take();
+                    }
+                }
+                if (f != null) {
+                    --active;
+                    try {
+                        return f.get();
+                    } catch (ExecutionException eex) {
+                        ee = eex;
+                    } catch (RuntimeException rex) {
+                        ee = new ExecutionException(rex);
+                    }
+                }
+            }
+            if (ee == null) {
+                ee = new TaskExecutionException();
+            }
+            throw ee;
+        } finally {
+            for (int i = 0, size = futures.size(); i < size; i++) {
+                futures.get(i).cancel(true);
+            }
         }
     }
 
