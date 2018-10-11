@@ -344,8 +344,8 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
         if (ntasks == 0) {
             throw new IllegalArgumentException();
         }
-        MutableList<Future<T>> futures = new FastList<>(ntasks);
-        ExecutorCompletionService<T> ecs = new ExecutorCompletionService<>(this, throttleSupport);
+        final MutableList<Future<T>> futures = new FastList<>(ntasks);
+        final ExecutorCompletionService<T> ecs = new ExecutorCompletionService<>(this, throttleSupport);
 
         try {
             ExecutionException ee = null;
