@@ -12,6 +12,7 @@ plugins {
     id "io.spring.dependency-management" version "1.0.4.RELEASE" apply false
 }
 
+// 审视扫描
 buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
     termsOfServiceAgree = 'yes'
