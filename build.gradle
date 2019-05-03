@@ -8,21 +8,22 @@ buildscript {
 }
 
 plugins {
-    id "com.gradle.build-scan" version "1.11"
-    id "io.spring.dependency-management" version "1.0.5.RELEASE" apply false
+    id "com.gradle.build-scan" version "2.2.1"
+    id "io.spring.dependency-management" version "1.0.4.RELEASE" apply false
 }
 
-// 审视扫描
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+
+    publishAlways()
 }
 
 ext {
     moduleProjects = subprojects.findAll {
         !it.name.equals('component-build-script')
     }
-    localRepository = '{user.home}/.m2/repository'
+    localRepository = '/home/shaw/.m2/repository/'
 }
 
 // 所有项目配置
@@ -31,7 +32,7 @@ configure(allprojects) { project ->
     apply plugin: "propdeps"
     apply plugin: "java"
 
-    group = "org.shaw"
+    group = "org.lucas"
     version = '1.0-SNAPSHOT'
 
     repositories {
@@ -53,7 +54,7 @@ configure(moduleProjects) { subproject ->
     uploadArchives.repositories.mavenDeployer {
         repository(url: uri(localRepository))
         // 组名
-        pom.groupId = 'org.shaw'
+        pom.groupId = 'org.lucas'
         // 版本号
         pom.version = '1.0-SNAPSHOT'
     }
@@ -62,6 +63,7 @@ configure(moduleProjects) { subproject ->
     ext {
         artifactId = uploadArchives.repositories.mavenDeployer.pom.artifactId
 
+        logbackVersion = "1.2.3"
         junitVersion = "4.12"
         mockitoVersion = "2.12.0"
         hamcrestVersion = "1.3"

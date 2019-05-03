@@ -1,4 +1,4 @@
-group=org.shaw.extension.activate.impl.GroupActivateExtImpl
-value=org.shaw.extension.activate.impl.ValueActivateExtImpl
-order1=org.shaw.extension.activate.impl.OrderActivateExtImpl1
-order2=org.shaw.extension.activate.impl.OrderActivateExtImpl2
+group=org.lucas.extension.activate.impl.GroupActivateExtImpl
+value=org.lucas.extension.activate.impl.ValueActivateExtImpl
+order1=org.lucas.extension.activate.impl.OrderActivateExtImpl1
+order2=org.lucas.extension.activate.impl.OrderActivateExtImpl2
