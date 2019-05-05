@@ -57,18 +57,19 @@ configure(moduleProjects) { subproject ->
         // 组名
         pom.groupId = 'org.lucas'
         // 版本号
-        pom.version = '1.0-SNAPSHOT'
+        pom.version = '1.0'
     }
 
     // 属性配置
     ext {
         artifactId = uploadArchives.repositories.mavenDeployer.pom.artifactId
 
+        disruptorVersion = "3.4.2"
         logbackVersion = "1.2.3"
         junitVersion = "4.12"
         mockitoVersion = "2.12.0"
         hamcrestVersion = "1.3"
-        springVersion = "5.0.1.RELEASE"
+        springVersion = "5.1.6.RELEASE"
         javassistVersion = "3.22.0-GA"
         collectionsVersion = "9.2.0"
     }
