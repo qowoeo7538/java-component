@@ -1,6 +1,7 @@
 package org.lucas.task.support;
 
 import com.lmax.disruptor.EventFactory;
+import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
@@ -13,12 +14,12 @@ import java.util.Queue;
  * 单生产者 -> 多个消费者
  * 多个生产者 -> 多个消费者
  */
-public class RingQueue<E extends EventFactory> implements Queue {
+public class RingQueue<T> implements Queue {
 
-    private final Disruptor<E> disruptor;
+    private final RingBuffer<T> ringBuffer;
 
-    public RingQueue(final int queueSize, E event) {
-        disruptor = new Disruptor(event, queueSize, DaemonThreadFactory.INSTANCE);
+    public RingQueue() {
+
     }
 
     /**
