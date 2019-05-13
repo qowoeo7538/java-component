@@ -3,6 +3,7 @@ description = "Component Common"
 artifactId = 'component-common'
 
 dependencies {
+    compile("com.lmax:disruptor:3.4.2")
     compile("org.springframework:spring-core")
     compile("org.springframework:spring-context")
     compile("org.javassist:javassist:${javassistVersion}")

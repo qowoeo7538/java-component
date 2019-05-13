@@ -3,12 +3,12 @@ package org.lucas.task;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.lucas.core.Constants;
-import org.lucas.task.support.AfterFunction;
-import org.lucas.task.support.DefaultFuture;
-import org.lucas.task.support.TaskExecutionException;
 import org.lucas.task.support.AbortPolicyWithReport;
+import org.lucas.task.support.AfterFunction;
 import org.lucas.task.support.BeforeFunction;
+import org.lucas.task.support.DefaultFuture;
 import org.lucas.task.support.ExecutorCompletionService;
+import org.lucas.task.support.TaskExecutionException;
 import org.lucas.task.support.ThrottleSupport;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -93,11 +93,9 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
      */
     private int awaitTerminationSeconds = 0;
 
-    private BeforeFunction before = (r, t) -> {
-    };
+    private BeforeFunction before = ThreadPoolTaskExecutor::beforeEmptyMethod;
 
-    private AfterFunction after = (r, t) -> {
-    };
+    private AfterFunction after = ThreadPoolTaskExecutor::afterEmptyMethod;
 
     public ThreadPoolTaskExecutor() {
         this(DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
@@ -398,6 +396,12 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
         }
     }
 
+    private static void beforeEmptyMethod(final Runnable task, final Thread thread) {
+    }
+
+    private static void afterEmptyMethod(final Runnable task, final Throwable throwable) {
+    }
+
     /**
      * 尝试取消剩下的 {@code Future} 任务
      *
@@ -487,7 +491,7 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
     }
 
     /**
-     * TODO 尝试用 RingBuffer 改造
+     * TODO RingBuffer 改造
      * <p>
      * {@code BlockingQueue} 存取锁，会导致性能低下，
      * 通过 {@code LinkedTransferQueue} 预占模式，保证更好的性能,
