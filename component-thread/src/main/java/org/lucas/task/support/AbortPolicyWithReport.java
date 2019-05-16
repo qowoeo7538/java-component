@@ -3,7 +3,8 @@ package org.lucas.task.support;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lucas.core.Constants;
-import org.lucas.util.JvmUtils;
+import org.lucas.util.StreamUtils;
+import org.lucas.util.ThreadInfoUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,16 +21,24 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class AbortPolicyWithReport implements RejectedExecutionHandler {
 
-    /** 日志 */
+    /**
+     * 日志
+     */
     private static final Log log = LogFactory.getLog(AbortPolicyWithReport.class);
 
-    /** 最后打印时间 */
+    /**
+     * 最后打印时间
+     */
     private static volatile long lastPrintTime = 0;
 
-    /** 处理间隔时间 */
+    /**
+     * 处理间隔时间
+     */
     private static final long INTERVAL_TIME = 10 * 60 * 1000;
 
-    /** 只能同时处理一次 */
+    /**
+     * 只能同时处理一次
+     */
     private static Semaphore guard = new Semaphore(1);
 
     @Override
@@ -77,10 +86,9 @@ public class AbortPolicyWithReport implements RejectedExecutionHandler {
             } else {
                 sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
             }
-
             String dateStr = sdf.format(new Date());
             try (FileOutputStream jstackStream = new FileOutputStream(new File(dumpPath, "JStack.logger" + "." + dateStr))) {
-                JvmUtils.jstack(jstackStream);
+                StreamUtils.copy(ThreadInfoUtils.jstack().getBytes(), jstackStream);
             } catch (Throwable t) {
                 log.error("dump jstack error", t);
             } finally {

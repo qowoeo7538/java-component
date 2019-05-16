@@ -1,7 +1,5 @@
 package org.lucas.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
@@ -9,23 +7,40 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
 /**
- * JVM运行时跟踪工具
+ * JVM运行时线程跟踪工具
  */
-public abstract class JvmUtils {
+public abstract class ThreadInfoUtils {
 
-    public static void jstack(final OutputStream stream) throws IOException {
-        // 虚拟机线程系统管理
-        ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+    /**
+     * 虚拟机线程系统管理
+     */
+    public static final ThreadMXBean threadMxBean = ManagementFactory.getThreadMXBean();
+
+    /**
+     * @return 所有活动线程的线程信息，并带有堆栈跟踪和同步信息。
+     */
+    public static String jstack() {
         /**
-         * 返回所有活动线程的线程信息，并带有堆栈跟踪和同步信息。
-         *
          * @param lockedMonitors: synchronized(Object obj)
          * @param lockedSynchronizers: 常指 ReentrantLock 和 ReentrantReadWriteLock 锁
          */
-        ThreadInfo[] threadInfos = threadMxBean.dumpAllThreads(true, true);
+        final ThreadInfo[] threadInfos = threadMxBean.dumpAllThreads(true, true);
+        StringBuilder sb = new StringBuilder();
         for (ThreadInfo threadInfo : threadInfos) {
-            stream.write(getThreadDumpString(threadInfo).getBytes());
+            sb.append(getThreadDump(threadInfo));
         }
+        return sb.toString();
+    }
+
+    /**
+     * 根据线程ID查询线程信息
+     *
+     * @param id 线程ID
+     * @return 线程信息
+     */
+    public static String getThreadDump(final Long id) {
+        final ThreadInfo threadInfo = threadMxBean.getThreadInfo(id);
+        return getThreadDump(threadInfo);
     }
 
     /**
@@ -34,8 +49,8 @@ public abstract class JvmUtils {
      * @param threadInfo {@code ThreadInfo}
      * @return 日志信息
      */
-    private static String getThreadDumpString(final ThreadInfo threadInfo) {
-        StringBuilder sb = new StringBuilder("\"" + threadInfo.getThreadName() + "\"" +
+    public static String getThreadDump(final ThreadInfo threadInfo) {
+        final StringBuilder sb = new StringBuilder("\"" + threadInfo.getThreadName() + "\"" +
                 " Id=" + threadInfo.getThreadId() + " " +
                 threadInfo.getThreadState());
         // 获取线程等待锁
@@ -58,8 +73,8 @@ public abstract class JvmUtils {
         sb.append('\n');
         int i = 0;
         // 获取线程栈信息
-        StackTraceElement[] stackTrace = threadInfo.getStackTrace();
-        MonitorInfo[] lockedMonitors = threadInfo.getLockedMonitors();
+        final StackTraceElement[] stackTrace = threadInfo.getStackTrace();
+        final MonitorInfo[] lockedMonitors = threadInfo.getLockedMonitors();
         for (; i < stackTrace.length && i < 32; i++) {
             // 最后执行的任务 --- 最开始执行的任务
             StackTraceElement ste = stackTrace[i];

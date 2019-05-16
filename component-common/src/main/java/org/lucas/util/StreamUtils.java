@@ -40,21 +40,13 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
     }
 
     /**
-     * @param buffer      缓冲区
-     * @param readProcess 处理对象
-     */
-    public static void bufferProcess(ByteBuffer buffer, ReadProcess readProcess) {
-
-    }
-
-    /**
      * char转换byte[]
      *
-     * @param chars
-     * @param encode
-     * @return
+     * @param chars  字符
+     * @param encode 编码
+     * @return 字节
      */
-    public static byte[] getChartoBytes(char chars, String encode) {
+    public static byte[] getChartoByte(char chars, String encode) {
         Charset cs = Charset.forName(encode);
         //分配缓冲区
         CharBuffer cb = CharBuffer.allocate(1);
@@ -68,7 +60,7 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
     }
 
     /**
-     * @param fileName
+     * @param fileName 文件路径名
      * @return 以字节为单位返回文件大小;
      */
     public static long getFileSize(String fileName) throws Exception {
@@ -86,7 +78,7 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
      * @param hashType "MD5"，"SHA1","SHA-1"，"SHA-256"，"SHA-384"，"SHA-512"
      * @return
      */
-    public static String getFileMD5(File file, String hashType) {
+    public static String getFileMd5(File file, String hashType) {
         if (!file.isFile()) {
             return null;
         }
@@ -109,8 +101,8 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
     /**
      * 文件字节转字符串
      *
-     * @param file
-     * @return
+     * @param file 文件路径
+     * @return 以 base64 的方式编码转成字符串
      * @throws Exception
      */
     public static String byteToString(File file) throws IOException {
@@ -131,13 +123,13 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
     }
 
     /**
-     * 字符串转文件
+     * 将以 base64 的字符串转换成文件
      *
-     * @param str
-     * @param file
+     * @param str  字符串
+     * @param file 文件
      * @throws Exception
      */
-    public static void strTobyte(String str, File file) throws IOException {
+    public static void strToByte(String str, File file) throws IOException {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             BASE64Decoder base64 = new BASE64Decoder();
             fileOutputStream.write(base64.decodeBuffer(str));
