@@ -1,5 +1,7 @@
 package org.lucas.core.collect;
 
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -27,7 +29,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E>, Seri
         map = new ConcurrentHashMap<>(initialCapacity);
     }
 
-    public ConcurrentHashSet(Collection<? extends E> c) {
+    public ConcurrentHashSet(final Collection<? extends E> c) {
         map = new ConcurrentHashMap<>();
         addAll(c);
     }

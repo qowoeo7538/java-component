@@ -1,10 +1,11 @@
 package org.lucas.extension.factory;
 
-import org.lucas.extension.ExtensionLoader;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.lucas.extension.Adaptive;
 import org.lucas.extension.ExtensionFactory;
+import org.lucas.extension.ExtensionLoader;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class AdaptiveExtensionFactory implements ExtensionFactory {
 
     public AdaptiveExtensionFactory() {
         ExtensionLoader<ExtensionFactory> loader = ExtensionLoader.getExtensionLoader(ExtensionFactory.class);
-        List<ExtensionFactory> list = new ArrayList<>();
+        MutableList<ExtensionFactory> list = new FastList<>();
         for (String name : loader.getSupportedExtensions()) {
             list.add(loader.getExtension(name));
         }

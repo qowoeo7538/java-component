@@ -331,7 +331,7 @@ public class ExtensionLoader<T> {
     }
 
     /**
-     * 返回默认的别名, 如果返回 {@code null} 则没有配置
+     * @return 默认的别名, 如果返回 {@code null} 则没有配置
      */
     public String getDefaultExtensionName() {
         getExtensionClasses();

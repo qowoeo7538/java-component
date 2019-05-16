@@ -27,7 +27,7 @@ public abstract class ThreadInfoUtils {
         final ThreadInfo[] threadInfos = threadMxBean.dumpAllThreads(true, true);
         StringBuilder sb = new StringBuilder();
         for (ThreadInfo threadInfo : threadInfos) {
-            sb.append(getThreadDump(threadInfo));
+            sb.append(dumpThreadInfo(threadInfo));
         }
         return sb.toString();
     }
@@ -38,9 +38,9 @@ public abstract class ThreadInfoUtils {
      * @param id 线程ID
      * @return 线程信息
      */
-    public static String getThreadDump(final Long id) {
+    public static String dumpThreadInfo(final Long id) {
         final ThreadInfo threadInfo = threadMxBean.getThreadInfo(id);
-        return getThreadDump(threadInfo);
+        return dumpThreadInfo(threadInfo);
     }
 
     /**
@@ -49,7 +49,7 @@ public abstract class ThreadInfoUtils {
      * @param threadInfo {@code ThreadInfo}
      * @return 日志信息
      */
-    public static String getThreadDump(final ThreadInfo threadInfo) {
+    public static String dumpThreadInfo(final ThreadInfo threadInfo) {
         final StringBuilder sb = new StringBuilder("\"" + threadInfo.getThreadName() + "\"" +
                 " Id=" + threadInfo.getThreadId() + " " +
                 threadInfo.getThreadState());

@@ -22,20 +22,40 @@ import java.util.regex.Pattern;
  */
 public class JavassistCompiler extends AbstractCompiler {
 
-    /** 导入包匹配('\n'强制要求必须换行) */
+    /**
+     * 导入包匹配('\n'强制要求必须换行)
+     */
     private static final Pattern IMPORT_PATTERN = Pattern.compile("import\\s+([\\w\\.\\*]+);\n");
 
-    /** 源代码中父类匹配 */
+    /**
+     * 源代码中父类匹配
+     */
     private static final Pattern EXTENDS_PATTERN = Pattern.compile("\\s+extends\\s+([\\w\\.]+)[^\\{]*\\{\n");
 
-    /** 源代码中接口匹配 */
+    /**
+     * 源代码中接口匹配
+     */
     private static final Pattern IMPLEMENTS_PATTERN = Pattern.compile("\\s+implements\\s+([\\w\\.]+)\\s*\\{\n");
 
-    /** 源代码属性匹配 */
+    /**
+     * 源代码属性匹配
+     */
     private static final Pattern METHODS_PATTERN = Pattern.compile("\n(private|public|protected)\\s+");
 
-    /** 通过判断 "=" 来确定是否属性. */
+    /**
+     * 通过判断 "=" 来确定是否属性.
+     */
     private static final Pattern FIELD_PATTERN = Pattern.compile("[^\n]+=[^\n]+;");
+
+    /**
+     * public 修饰符
+     */
+    private static final String PUBLIC_MODIFIER = "public ";
+
+    /**
+     * private 修饰符
+     */
+    private static final String PRIVATE_MODIFIER = "private ";
 
     @Override
     protected Class<?> doCompile(final String name, final String source) throws Throwable {
@@ -119,13 +139,13 @@ public class JavassistCompiler extends AbstractCompiler {
             if (method.length() > 0) {
                 if (method.startsWith(className)) {
                     // 添加构造方法
-                    cls.addConstructor(CtNewConstructor.make("public " + method, cls));
+                    cls.addConstructor(CtNewConstructor.make(PUBLIC_MODIFIER + method, cls));
                 } else if (FIELD_PATTERN.matcher(method).matches()) {
                     // 添加字段
-                    cls.addField(CtField.make("private " + method, cls));
+                    cls.addField(CtField.make(PRIVATE_MODIFIER + method, cls));
                 } else {
                     // 在类中根据源代码创建一个方法
-                    cls.addMethod(CtNewMethod.make("public " + method, cls));
+                    cls.addMethod(CtNewMethod.make(PUBLIC_MODIFIER + method, cls));
                 }
             }
         }

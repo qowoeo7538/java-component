@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
  * @create: 2017-11-07
  * @description: 分段拷贝文件
  */
-public class CopyFile {
+public class SegmentCopyFile {
     /**
      * 文件名
      */
@@ -27,10 +27,10 @@ public class CopyFile {
      */
     private int count;
 
-    public CopyFile(String srcName, String copyName, int count) {
+    public SegmentCopyFile(String srcName, String copyName, int count) {
         this.srcName = srcName;
         try {
-            this.fileSize = StreamUtils.getFileSize(CopyFile.this.srcName);
+            this.fileSize = StreamUtils.getFileSize(SegmentCopyFile.this.srcName);
         } catch (Exception e) {
             throw ExceptionUtils.unchecked(e);
         }
@@ -77,12 +77,12 @@ public class CopyFile {
         private int block;
 
         public BlockCopyFile(int block) {
-            this.fileSize = CopyFile.this.fileSize;
-            this.srcName = CopyFile.this.srcName;
-            this.copyName = CopyFile.this.copyName;
-            this.count = CopyFile.this.count;
+            this.fileSize = SegmentCopyFile.this.fileSize;
+            this.srcName = SegmentCopyFile.this.srcName;
+            this.copyName = SegmentCopyFile.this.copyName;
+            this.count = SegmentCopyFile.this.count;
             this.block = block;
-            this.writeSize = (int) fileSize / CopyFile.this.count;
+            this.writeSize = (int) fileSize / SegmentCopyFile.this.count;
         }
 
         @Override

@@ -39,18 +39,26 @@ import java.util.Set;
  */
 public class JdkCompiler extends AbstractCompiler {
 
-    /** 类加载器 */
+    /**
+     * 类加载器
+     */
     private final ClassLoaderImpl classLoader;
 
     private final JavaFileManagerImpl javaFileManager;
 
-    /** java编译器 */
+    /**
+     * java编译器
+     */
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-    /** 诊断监听器 */
+    /**
+     * 诊断监听器
+     */
     private final DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
 
-    /** 编译相关参数 */
+    /**
+     * 编译相关参数
+     */
     private volatile List<String> options;
 
     /**
@@ -61,16 +69,16 @@ public class JdkCompiler extends AbstractCompiler {
     public JdkCompiler() {
         options = new ArrayList<>();
         options.add("-source");
-        options.add("1.8");
+        options.add("11");
         options.add("-target");
-        options.add("1.8");
+        options.add("11");
         /**
          * 标准的java文件管理器(java编译器需要)
          * 作用:
          *   1) 用于构建编译器的读写功能 (可能会减少对文件系统的扫描和jar文件读写的开销)
          *   2) 在多个编译任务之间共享
          */
-        StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
+        final StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         final ClassLoader loader = ClassUtils.getDefaultClassLoader();
         /**
          * 1) 是 URLClassLoader 加载器的实例(通过指向目标文件加载类)
@@ -148,7 +156,7 @@ public class JdkCompiler extends AbstractCompiler {
         @Override
         protected Class<?> findClass(final String name) throws ClassNotFoundException {
             // 获取java源代码和class文件
-            JavaFileObject file = classes.get(name);
+            final JavaFileObject file = classes.get(name);
             if (file != null) {
                 // 获取源代码的字节
                 byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
@@ -212,10 +220,14 @@ public class JdkCompiler extends AbstractCompiler {
      */
     private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
 
-        /** 源代码 */
+        /**
+         * 源代码
+         */
         private final CharSequence source;
 
-        /** 源代码字节 */
+        /**
+         * 源代码字节
+         */
         private ByteArrayOutputStream bytecode;
 
         JavaFileObjectImpl(final String name, final Kind kind) {
@@ -288,12 +300,13 @@ public class JdkCompiler extends AbstractCompiler {
      */
     private static final class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManager> {
 
-        /** 类加载器 */
+        /**
+         * 类加载器
+         */
         private final ClassLoaderImpl classLoader;
 
         /**
-         * KEY:   URI
-         * VALUE: JavaFileObject
+         * URI --> JavaFileObject
          */
         private final Map<URI, JavaFileObject> fileObjects = new HashMap<>();
 
@@ -308,7 +321,7 @@ public class JdkCompiler extends AbstractCompiler {
          * @param location     位置
          * @param packageName  包名
          * @param relativeName 相对名称
-         * @return FileObject
+         * @return {@code FileObject} 文件对象
          * @throws IOException
          */
         @Override

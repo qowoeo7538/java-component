@@ -1,9 +1,9 @@
 package org.lucas.compiler.support;
 
+import org.lucas.compiler.Compiler;
 import org.lucas.extension.Adaptive;
 import org.lucas.extension.ExtensionLoader;
 import org.lucas.util.StringUtils;
-import org.lucas.compiler.Compiler;
 
 /**
  * @create: 2018-03-15
@@ -12,7 +12,9 @@ import org.lucas.compiler.Compiler;
 @Adaptive
 public class AdaptiveCompiler implements Compiler {
 
-    /** 默认编译器(每次需要该参数时,都需要从主内存读取,保证并发时内存可见性) */
+    /**
+     * 默认编译器(每次需要该参数时,都需要从主内存读取,保证并发时内存可见性)
+     */
     private static volatile String DEFAULT_COMPILER;
 
     /**
@@ -29,7 +31,7 @@ public class AdaptiveCompiler implements Compiler {
      *
      * @param code
      * @param classLoader 类加载器
-     * @return Class
+     * @return {@code Class<?>} 类对象
      */
     @Override
     public Class<?> compile(final String code, final ClassLoader classLoader) {

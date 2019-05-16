@@ -13,21 +13,27 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractCompiler implements Compiler {
 
-    /** 包名匹配正则 */
+    /**
+     * 包名匹配正则
+     */
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);");
 
-    /** 类名匹配正则 */
+    /**
+     * 类名匹配正则
+     */
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+");
 
-    /** 代码结束符 */
+    /**
+     * 代码结束符
+     */
     private static final String CODE_ENDS_WITH = "}";
 
     /**
-     * 加载源代码
+     * 根据源代码和类加载器加载类
      *
      * @param code        源代码
      * @param classLoader 类加载器
-     * @return Class
+     * @return Class {@code Class<?>} 类对象
      */
     @Override
     public Class<?> compile(String code, final ClassLoader classLoader) {
@@ -53,16 +59,16 @@ public abstract class AbstractCompiler implements Compiler {
         try {
             // 尝试加载 class 文件到内存
             return Class.forName(className, true, getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             if (!code.endsWith(CODE_ENDS_WITH)) {
                 throw new IllegalStateException("java code 应该以 \"}\" 结尾, code: \n" + code + "\n");
             }
             try {
                 // 尝试通过 className 和 code 编译文件并且加载
                 return doCompile(className, code);
-            } catch (RuntimeException t) {
+            } catch (final RuntimeException t) {
                 throw t;
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 throw new IllegalStateException("编译java文件失败, 原因: " + t.getMessage() + ", class: " + className
                         + ", code: \n" + code + "\n, stack: " + ExceptionUtils.toString(t));
             }
@@ -74,9 +80,9 @@ public abstract class AbstractCompiler implements Compiler {
      *
      * @param name   类全名
      * @param source 源代码
-     * @return Class
+     * @return Class {@code Class<?>} 类对象
      * @throws Throwable
      */
-    protected abstract Class<?> doCompile(String name, String source) throws Throwable;
+    protected abstract Class<?> doCompile(final String name, final String source) throws Throwable;
 
 }
