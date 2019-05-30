@@ -1,6 +1,7 @@
 package org.lucas.compiler.support;
 
 import org.lucas.util.ClassUtils;
+import org.lucas.util.ConfigUtils;
 import org.lucas.util.ResourceUtils;
 
 import javax.tools.DiagnosticCollector;
@@ -69,9 +70,9 @@ public class JdkCompiler extends AbstractCompiler {
     public JdkCompiler() {
         options = new ArrayList<>();
         options.add("-source");
-        options.add("11");
+        options.add(ConfigUtils.JDK_VERSION);
         options.add("-target");
-        options.add("11");
+        options.add(ConfigUtils.JDK_VERSION);
         /**
          * 标准的java文件管理器(java编译器需要)
          * 作用:

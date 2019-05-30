@@ -1,7 +1,5 @@
 package org.lucas.core.collect;
 
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;

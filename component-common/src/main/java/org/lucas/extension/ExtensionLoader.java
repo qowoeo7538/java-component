@@ -418,7 +418,7 @@ public class ExtensionLoader<T> {
         return type.isAnnotationPresent(SPI.class);
     }
 
-    private boolean isActive(String[] keys, ExtURL url) {
+    private boolean isActive(final String[] keys, final ExtURL url) {
         if (keys.length == 0) {
             return true;
         }
@@ -443,7 +443,7 @@ public class ExtensionLoader<T> {
      * @param groups 数组列表
      * @return if {@code true} 包含
      */
-    private boolean isMatchGroup(String group, String[] groups) {
+    private boolean isMatchGroup(final String group, final String[] groups) {
         if (group == null || group.length() == 0) {
             return true;
         }
