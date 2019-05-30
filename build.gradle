@@ -57,7 +57,7 @@ configure(moduleProjects) { subproject ->
         // 组名
         pom.groupId = 'org.lucas'
         // 版本号
-        pom.version = '1.0'
+        pom.version = '1.0-SNAPSHOT'
     }
 
     // 属性配置
@@ -86,8 +86,8 @@ configure(moduleProjects) { subproject ->
 
     [compileJava, compileTestJava].each() {
         it.options.encoding = 'UTF-8'
-        it.sourceCompatibility = 1.8
-        it.targetCompatibility = 1.8
+        it.sourceCompatibility = 11
+        it.targetCompatibility = 11
     }
 
     compileTestJava {

@@ -1,8 +1,6 @@
 package org.lucas.util;
 
 import org.lucas.io.support.ReadProcess;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +13,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ScatteringByteChannel;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.util.Base64;
 
 /**
  * io工具类
@@ -108,7 +107,7 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
     public static String byteToString(File file) throws IOException {
         StringBuilder returnDatas = new StringBuilder();
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            BASE64Encoder base64 = new BASE64Encoder();
+            Base64.Encoder encoder = Base64.getEncoder();
             byte[] buf = new byte[10 * 1024];
             int readLenth;
             while ((readLenth = fileInputStream.read(buf)) != -1) {
@@ -116,7 +115,7 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
                 for (int i = 0; i < copyByte.length; i++) {
                     copyByte[i] = buf[i];
                 }
-                returnDatas.append(base64.encode(copyByte));
+                returnDatas.append(encoder.encode(copyByte));
             }
         }
         return returnDatas.toString();
@@ -131,8 +130,8 @@ public abstract class StreamUtils extends org.springframework.util.StreamUtils {
      */
     public static void strToByte(String str, File file) throws IOException {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-            BASE64Decoder base64 = new BASE64Decoder();
-            fileOutputStream.write(base64.decodeBuffer(str));
+            Base64.Decoder decoder = Base64.getDecoder();
+            fileOutputStream.write(decoder.decode(str));
         }
     }
 }
