@@ -7,7 +7,11 @@ package org.lucas.util;
  */
 public abstract class StringUtils extends org.springframework.util.StringUtils {
 
-
+    /**
+     * @param camelName 字符串
+     * @param split     分割符号
+     * @return
+     */
     public static String camelToSplitName(final String camelName, final String split) {
         if (isEmpty(camelName)) {
             return camelName;
