@@ -230,7 +230,7 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException(type + " 必须是接口或抽象类!");
         }
         if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException(type + " 不是一个SPI接口类, 没有 @" + SPI.class.getSimpleName() + " 注解!");
+            throw new IllegalArgumentException(type + " 不是一个SPI接口类, 没有 @SPI 注解!");
         }
         // 尝试获取该 type 的 ExtensionLoader 对象
         ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
@@ -898,6 +898,12 @@ public class ExtensionLoader<T> {
         }
     }
 
+    /**
+     * 动态生成类
+     *
+     * @param instance 类
+     * @return 动态生成类
+     */
     private T injectExtension(final T instance) {
         try {
             if (objectFactory != null) {

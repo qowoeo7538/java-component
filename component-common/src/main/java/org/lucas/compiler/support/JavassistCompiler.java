@@ -39,16 +39,6 @@ public class JavassistCompiler extends AbstractCompiler {
      */
     private static final Pattern FIELD_PATTERN = Pattern.compile("[^\n]+=[^\n]+;");
 
-    /**
-     * public 修饰符
-     */
-    private static final String PUBLIC_MODIFIER = "public ";
-
-    /**
-     * private 修饰符
-     */
-    private static final String PRIVATE_MODIFIER = "private ";
-
     @Override
     protected Class<?> doCompile(final String name, final String source) throws Throwable {
         final CtClassBuilder builder = new CtClassBuilder();
@@ -94,3 +84,6 @@ public class JavassistCompiler extends AbstractCompiler {
         return cls.toClass(ClassUtils.getCallerClassLoader(getClass()), JavassistCompiler.class.getProtectionDomain());
     }
 }
+
+
+
