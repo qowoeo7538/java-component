@@ -30,34 +30,13 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class ExtensionLoader<T> {
+public class ExtensionLoader<T> extends AbstractLoader<T> {
 
     private static final String REMOVE_VALUE_PREFIX = "-";
 
     private static final String DEFAULT_KEY = "default";
 
-    // ===================================================================
 
-    /**
-     * 默认 SPI 目录
-     */
-    private static final String SERVICES_DIRECTORY = "META-INF/services/";
-
-    /**
-     * 自定义 SPI 目录
-     */
-    private static final String DIRECTORY = "META-INF/component/";
-
-    /**
-     * 自定义 SPI 目录
-     */
-    private static final String INTERNAL_DIRECTORY = DIRECTORY + "internal/";
-
-    // =============================
-
-    /**
-     * 构建过的对象, 将保存到该对象中进行缓存 Map:{Class 对象 -> ExtensionLoader}
-     */
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
 
     /**
@@ -86,10 +65,7 @@ public class ExtensionLoader<T> {
      */
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<>();
 
-    /**
-     * {@code Holder} 维护一个 Map:{type 实现类的别名 -> 实现类的 Class}
-     */
-    private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
+
 
     /**
      * SPI 接口
@@ -213,34 +189,6 @@ public class ExtensionLoader<T> {
             exts.addAll(usrs);
         }
         return exts;
-    }
-
-    /**
-     * 尝试从 {@link #EXTENSION_LOADERS} 获取 {@code ExtensionLoader}，
-     * 如果为 {@code null}, 再构造该 Class 的 {@code ExtensionLoader} 放入 {@link #EXTENSION_LOADERS}
-     *
-     * @param type 类类型对象
-     * @return {@code ExtensionLoader<T>}
-     */
-    public static <T> ExtensionLoader<T> getExtensionLoader(final Class<T> type) {
-        if (type == null) {
-            throw new IllegalArgumentException("参数[type]不能为null!");
-        }
-        if (!(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
-            throw new IllegalArgumentException(type + " 必须是接口或抽象类!");
-        }
-        if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException(type + " 不是一个SPI接口类, 没有 @SPI 注解!");
-        }
-        // 尝试获取该 type 的 ExtensionLoader 对象
-        ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
-        if (loader == null) {
-            // 构建 ExtensionLoader(type) 对象
-            // 如果 key 存在则不做修改
-            EXTENSION_LOADERS.putIfAbsent(type, new ExtensionLoader<T>(type));
-            loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
-        }
-        return loader;
     }
 
     /**
@@ -407,16 +355,6 @@ public class ExtensionLoader<T> {
         return new IllegalStateException(buf.toString());
     }
 
-    /**
-     * 判断该方法是否包含 SPI 注解
-     *
-     * @param type 类类型对象
-     * @param <T>
-     * @return 如果包含 SPI 注解则返回 {@code true}
-     */
-    private static <T> boolean withExtensionAnnotation(Class<T> type) {
-        return type.isAnnotationPresent(SPI.class);
-    }
 
     private boolean isActive(final String[] keys, final ExtURL url) {
         if (keys.length == 0) {
@@ -473,24 +411,7 @@ public class ExtensionLoader<T> {
         }
     }
 
-    /**
-     * @see #getExtensionClasses()
-     */
-    private Class<?> getAdaptiveExtensionClass() {
-        getExtensionClasses();
-        if (cachedAdaptiveClass != null) {
-            return cachedAdaptiveClass;
-        }
-        return cachedAdaptiveClass = createAdaptiveExtensionClass();
-    }
 
-    private Class<?> createAdaptiveExtensionClass() {
-        String code = createAdaptiveExtensionClassCode();
-        ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
-        Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class)
-                .getAdaptiveExtension();
-        return compiler.compile(code, classLoader);
-    }
 
     /**
      * 通过反射获取 {@link #type} 的源代码
@@ -706,25 +627,7 @@ public class ExtensionLoader<T> {
         return clazz;
     }
 
-    /**
-     * 双重检查
-     * 获取 {@link #cachedClasses}
-     *
-     * @see #loadExtensionClasses()
-     */
-    private Map<String, Class<?>> getExtensionClasses() {
-        Map<String, Class<?>> classes = cachedClasses.get();
-        if (classes == null) {
-            synchronized (cachedClasses) {
-                classes = cachedClasses.get();
-                if (classes == null) {
-                    classes = loadExtensionClasses();
-                    cachedClasses.set(classes);
-                }
-            }
-        }
-        return classes;
-    }
+
 
     /**
      * 读取的 SPI 目录下对应的文件,加载 Class.
