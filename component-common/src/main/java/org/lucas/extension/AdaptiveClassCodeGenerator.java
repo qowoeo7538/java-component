@@ -5,6 +5,7 @@ import org.lucas.util.StringUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * 通过反射获取{@link #type}的源代码进行动态编译
@@ -31,6 +32,8 @@ public class AdaptiveClassCodeGenerator {
      */
     private static final String CODE_UNSUPPORTED = "throw new UnsupportedOperationException(\"The method %s of interface %s is not adaptive method!\");\n";
 
+    private static final String CLASSNAME_INVOCATION = "org.apache.dubbo.rpc.Invocation";
+
     /**
      *
      */
@@ -47,17 +50,23 @@ public class AdaptiveClassCodeGenerator {
     private final Class<?> type;
 
     /**
+     * 匹配方法参数特殊处理类型
+     */
+    private final String[] parameterClasses;
+
+    /**
      * 默认扩展名
      */
     private String defaultExtName;
 
-    public AdaptiveClassCodeGenerator(Class<?> type, String defaultExtName) {
+    public AdaptiveClassCodeGenerator(Class<?> type, String[] parameterClasses, String defaultExtName) {
         this.type = type;
+        this.parameterClasses = parameterClasses;
         this.defaultExtName = defaultExtName;
     }
 
     /**
-     * @return 类代码
+     * @return 动态生成代码
      */
     public String generate() {
         // 不需要生成适配代码,因为不包含 @Adaptive.
@@ -132,6 +141,8 @@ public class AdaptiveClassCodeGenerator {
                 // 如果没有 ExtURL参数,则寻找包含 ExtURL的 getter 方法.
                 code.append(generateUrlAssignmentIndirectly(method));
             }
+            boolean hasInvocation = hasInvocationArgument(method);
+
             String[] value = getMethodAdaptiveValue(adaptiveAnnotation);
 
             code.append(generateExtNameAssignment(value, hasInvocation));
@@ -164,6 +175,16 @@ public class AdaptiveClassCodeGenerator {
             }
         }
         return urlTypeIndex;
+    }
+
+    /**
+     * 判断方法参数是不是有匹配类型
+     */
+    private boolean hasInvocationArgument(final String[] classType, final Method method) {
+        final Class<?>[] pts = method.getParameterTypes();
+
+        return Arrays.stream(pts).anyMatch(p -> IntStream.range(0, classType.length)
+                .anyMatch(i -> classType[i].equals(p.getName())));
     }
 
     /**
