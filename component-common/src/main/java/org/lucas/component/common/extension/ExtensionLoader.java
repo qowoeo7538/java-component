@@ -1,12 +1,9 @@
 package org.lucas.component.common.extension;
 
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
+import org.lucas.component.common.compiler.Compiler;
 import org.lucas.component.common.core.Constants;
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
-import org.lucas.component.common.extension.support.ActivateComparator;
 import org.lucas.component.common.util.ClassUtils;
-import org.lucas.component.common.util.ConfigUtils;
 import org.lucas.component.common.util.ExceptionUtils;
 import org.lucas.component.common.util.Holder;
 import org.lucas.component.common.util.StringUtils;
@@ -16,13 +13,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -142,12 +137,24 @@ public class ExtensionLoader<T> {
     }
 
     /**
+     * ExtensionLoader<type> 基于 ExtensionLoader<ExtensionFactory> 构建,
+     * 所以会先构建 ExtensionLoader<ExtensionFactory> 对象
+     *
+     * @param type 类类型
+     */
+    private ExtensionLoader(final Class<?> type) {
+        this.type = type;
+        // 创建对象的 SPI 工厂类
+        objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
+    }
+
+    /**
      * 双重检查
      * 获取 {@link #cachedClasses}
      *
      * @see #loadExtensionClasses()
      */
-    protected Map<String, Class<?>> getExtensionClasses() {
+    private Map<String, Class<?>> getExtensionClasses() {
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
             synchronized (cachedClasses) {
@@ -159,34 +166,6 @@ public class ExtensionLoader<T> {
             }
         }
         return classes;
-    }
-
-    /**
-     * 判断该方法是否包含 SPI 注解
-     *
-     * @param type 类类型对象
-     * @param <T>
-     * @return 如果包含 SPI 注解则返回 {@code true}
-     */
-    private static <T> boolean withExtensionAnnotation(Class<T> type) {
-        return type.isAnnotationPresent(SPI.class);
-    }
-
-
-    /**
-     * ExtensionLoader<type> 基于 ExtensionLoader<ExtensionFactory> 构建,
-     * 所以会先构建 ExtensionLoader<ExtensionFactory> 对象
-     *
-     * @param type 类类型
-     */
-    private ExtensionLoader(final Class<?> type) {
-        this.type = type;
-        // 创建对象的 SPI 工厂类,忽略掉本身就是工厂的 ExtensionFactory 类
-        objectFactory = (type == ExtensionFactory.class ? null :
-                ExtensionLoader
-                        // 获取 ExtensionFactory 工厂的 ExtensionLoader 对象
-                        .getExtensionLoader(ExtensionFactory.class)
-                        .getAdaptiveExtension());
     }
 
     /**
@@ -213,64 +192,6 @@ public class ExtensionLoader<T> {
             }
         }
         return (T) instance;
-    }
-
-    public List<T> getActivateExtension(final ExtURL url, final String key, final String group) {
-        final String value = url.getParameter(key);
-        return getActivateExtension(url, value == null || value.length() == 0 ? null : Constants.COMMA_SPLIT_PATTERN.split(value), group);
-    }
-
-    public List<T> getActivateExtension(final ExtURL url, final String[] values, final String group) {
-        final MutableList<T> exts = Lists.mutable.empty();
-        final List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
-
-        if (!names.contains(REMOVE_VALUE_PREFIX + DEFAULT_KEY)) {
-            getExtensionClasses();
-            for (Iterator<Map.Entry<String, Object>> iterator = cachedActivates.entrySet().iterator(); iterator.hasNext(); ) {
-                Map.Entry<String, Object> entry = iterator.next();
-                String name = entry.getKey();
-                Object activate = entry.getValue();
-
-                String[] activateGroup, activateValue;
-
-                if (activate instanceof Activate) {
-                    activateGroup = ((Activate) activate).group();
-                    activateValue = ((Activate) activate).value();
-                } else {
-                    continue;
-                }
-
-                if (isMatchGroup(group, activateGroup)) {
-                    T ext = getExtension(name);
-                    if (!names.contains(name)
-                            && !names.contains(REMOVE_VALUE_PREFIX + name)
-                            && isActive(activateValue, url)) {
-                        exts.add(ext);
-                    }
-                }
-            }
-            exts.sort(ActivateComparator.getComparator());
-        }
-        List<T> usrs = new ArrayList<>();
-        for (int i = 0; i < names.size(); i++) {
-            String name = names.get(i);
-            if (!name.startsWith(REMOVE_VALUE_PREFIX)
-                    && !names.contains(REMOVE_VALUE_PREFIX + name)) {
-                if (DEFAULT_KEY.equals(name)) {
-                    if (!usrs.isEmpty()) {
-                        exts.addAll(0, usrs);
-                        usrs.clear();
-                    }
-                } else {
-                    T ext = getExtension(name);
-                    usrs.add(ext);
-                }
-            }
-        }
-        if (!usrs.isEmpty()) {
-            exts.addAll(usrs);
-        }
-        return exts;
     }
 
     /**
@@ -437,46 +358,6 @@ public class ExtensionLoader<T> {
         return new IllegalStateException(buf.toString());
     }
 
-
-    private boolean isActive(final String[] keys, final ExtURL url) {
-        if (keys.length == 0) {
-            return true;
-        }
-        for (String key : keys) {
-            for (Iterator<Map.Entry<String, String>> iterator = url.getParameters().entrySet().iterator(); iterator.hasNext(); ) {
-                Map.Entry<String, String> entry = iterator.next();
-                String k = entry.getKey();
-                String v = entry.getValue();
-                if ((k.equals(key) || k.endsWith("." + key))
-                        && !ConfigUtils.isEmpty(v)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断一个组是否包含在一组列表中
-     *
-     * @param group  组名
-     * @param groups 数组列表
-     * @return if {@code true} 包含
-     */
-    private boolean isMatchGroup(final String group, final String[] groups) {
-        if (group == null || group.length() == 0) {
-            return true;
-        }
-        if (groups != null && groups.length > 0) {
-            for (String g : groups) {
-                if (group.equals(g)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * @return 实例对象 T
      * @see #getAdaptiveExtensionClass()
@@ -491,6 +372,21 @@ public class ExtensionLoader<T> {
         } catch (final Exception e) {
             throw new IllegalStateException("不能创建 adaptive extension: " + type + ", 原因: " + e.getMessage(), e);
         }
+    }
+
+    private Class<?> getAdaptiveExtensionClass() {
+        getExtensionClasses();
+        if (cachedAdaptiveClass != null) {
+            return cachedAdaptiveClass;
+        }
+        return cachedAdaptiveClass = createAdaptiveExtensionClass();
+    }
+
+    private Class<?> createAdaptiveExtensionClass() {
+        String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();
+        ClassLoader classLoader = ClassUtils.getCallerClassLoader(ExtensionLoader.class);
+        Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class).getAdaptiveExtension();
+        return compiler.compile(code, classLoader);
     }
 
 
@@ -544,63 +440,6 @@ public class ExtensionLoader<T> {
                         .append(method.toString()).append(" of interface ")
                         .append(type.getName()).append(" is not adaptive method!\");");
             } else {
-                // ExtRUL 处理
-                int urlTypeIndex = -1;
-                for (int i = 0; i < pts.length; ++i) {
-                    if (pts[i].equals(ExtURL.class)) {
-                        urlTypeIndex = i;
-                        break;
-                    }
-                }
-
-                // 对 ExtURL 参数进行空指针检查
-                if (urlTypeIndex != -1) {
-                    String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"url == null\");",
-                            urlTypeIndex);
-                    code.append(s);
-
-                    s = String.format("\n%s url = arg%d;", ExtURL.class.getName(), urlTypeIndex);
-                    code.append(s);
-
-                } else {
-                    // 没有找到 URL.
-                    String attribMethod = null;
-
-                    // 在参数中寻找 URL.
-                    LBL_PTS:
-                    for (int i = 0; i < pts.length; ++i) {
-                        Method[] ms = pts[i].getMethods();
-                        for (Method m : ms) {
-                            String name = m.getName();
-                            if ((name.startsWith("get") || name.length() > 3)
-                                    && Modifier.isPublic(m.getModifiers())
-                                    && !Modifier.isStatic(m.getModifiers())
-                                    && m.getParameterTypes().length == 0
-                                    && m.getReturnType() == ExtURL.class) {
-                                urlTypeIndex = i;
-                                attribMethod = name;
-                                break LBL_PTS;
-                            }
-                        }
-                    }
-                    if (attribMethod == null) {
-                        throw new IllegalStateException("fail to create adaptive class for interface " + type.getName()
-                                + ": not found url parameter or url attribute in parameters of method " + method.getName());
-                    }
-
-                    // 空指针检查
-                    String s = String.format("\nif (arg%d == null) throw new IllegalArgumentException(\"%s argument == null\");",
-                            urlTypeIndex, pts[urlTypeIndex].getName());
-                    code.append(s);
-                    s = String.format("\nif (arg%d.%s() == null) throw new IllegalArgumentException(\"%s argument %s() == null\");",
-                            urlTypeIndex, attribMethod, pts[urlTypeIndex].getName(), attribMethod);
-                    code.append(s);
-
-                    // url 赋值
-                    s = String.format("%s url = arg%d.%s();", ExtURL.class.getName(), urlTypeIndex, attribMethod);
-                    code.append(s);
-                }
-
                 String[] value = adaptiveAnnotation.value();
                 // 默认 value
                 if (value.length == 0) {
@@ -613,28 +452,14 @@ public class ExtensionLoader<T> {
                 for (int i = value.length - 1; i >= 0; --i) {
                     if (i == value.length - 1) {
                         if (null != defaultExtName) {
-                            // 判断注解中是否存在 "protocol"
-                            if (!"protocol".equals(value[i])) {
-                                getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
-                            } else {
-                                getNameCode = String.format("( url.getProtocol() == null ? \"%s\" : url.getProtocol() )", defaultExtName);
-                            }
+                            getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
-                            if (!"protocol".equals(value[i])) {
-                                getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
-                            } else {
-                                getNameCode = "url.getProtocol()";
-                            }
+                            getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
                         }
                     } else {
-                        if (!"protocol".equals(value[i])) {
-                            getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
-                        } else {
-                            getNameCode = String.format("url.getProtocol() == null ? (%s) : url.getProtocol()", getNameCode);
-                        }
+                        getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
                     }
                 }
-
                 code.append("\nString extName = ").append(getNameCode).append(";");
                 String s = String.format("\nif(extName == null) " +
                                 "throw new IllegalStateException(\"Fail to get extension(%s) name from url(\" + url.toString() + \") use keys(%s)\");",
@@ -859,12 +684,6 @@ public class ExtensionLoader<T> {
             }
             final String[] names = Constants.COMMA_SPLIT_PATTERN.split(name);
             if (names != null && names.length > 0) {
-                // 获取 @Activate 注解信息
-                final Activate activate = clazz.getAnnotation(Activate.class);
-                if (activate != null) {
-                    // 将第一个别名和注解信息放入 cachedActivates 中.
-                    cachedActivates.put(names[0], activate);
-                }
                 for (String n : names) {
                     if (!cachedNames.containsKey(clazz)) {
                         // 检查 cachedNames 是否包含该 class, 没有则放入 cachedNames 中.
@@ -937,5 +756,16 @@ public class ExtensionLoader<T> {
         } catch (NoSuchMethodException e) {
             return false;
         }
+    }
+
+    /**
+     * 判断该方法是否包含 SPI 注解
+     *
+     * @param type 类类型对象
+     * @param <T>
+     * @return 如果包含 SPI 注解则返回 {@code true}
+     */
+    private static <T> boolean withExtensionAnnotation(Class<T> type) {
+        return type.isAnnotationPresent(SPI.class);
     }
 }
