@@ -1,15 +1,15 @@
-package org.lucas.task;
+package org.lucas.component.thread.task;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.lucas.component.common.core.Constants;
-import org.lucas.task.support.AbortPolicyWithReport;
-import org.lucas.task.support.AfterFunction;
-import org.lucas.task.support.BeforeFunction;
-import org.lucas.task.support.DefaultFuture;
-import org.lucas.task.support.ExecutorCompletionService;
-import org.lucas.task.support.TaskExecutionException;
-import org.lucas.task.support.ThrottleSupport;
+import org.lucas.component.thread.task.support.AbortPolicyWithReport;
+import org.lucas.component.thread.task.support.AfterFunction;
+import org.lucas.component.thread.task.support.BeforeFunction;
+import org.lucas.component.thread.task.support.DefaultFuture;
+import org.lucas.component.thread.task.support.ExecutorCompletionService;
+import org.lucas.component.thread.task.support.TaskExecutionException;
+import org.lucas.component.thread.task.support.ThrottleSupport;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;

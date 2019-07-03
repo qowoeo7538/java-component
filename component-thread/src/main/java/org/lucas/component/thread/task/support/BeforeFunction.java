@@ -1,4 +1,4 @@
-package org.lucas.task.support;
+package org.lucas.component.thread.task.support;
 
 @FunctionalInterface
 public interface BeforeFunction {

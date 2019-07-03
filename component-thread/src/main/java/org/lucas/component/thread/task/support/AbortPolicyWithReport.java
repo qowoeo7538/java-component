@@ -1,10 +1,10 @@
-package org.lucas.task.support;
+package org.lucas.component.thread.task.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lucas.component.common.core.Constants;
-import org.lucas.component.common.util.StreamUtils;
 import org.lucas.component.common.util.ThreadInfoUtils;
+import org.springframework.util.StreamUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
