@@ -1,9 +1,8 @@
 package org.lucas.component.common.compiler.support;
 
 import org.lucas.component.common.compiler.Compiler;
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.ExtensionLoader;
-import org.lucas.component.common.util.StringUtils;
+import org.lucas.component.common.extension.Adaptive;
+import org.lucas.component.common.extension.ExtensionLoader;
 
 /**
  * @create: 2018-03-15

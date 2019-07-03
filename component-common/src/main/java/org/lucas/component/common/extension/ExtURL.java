@@ -1,9 +1,9 @@
-package org.lucas.extension;
+package org.lucas.component.common.extension;
 
 import org.lucas.component.common.core.Constants;
 import org.lucas.component.common.util.CollectionUtils;
-import org.lucas.component.common.util.StringUtils;
 import org.lucas.component.common.util.NetUtils;
+import org.lucas.component.common.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -35,7 +35,9 @@ public final class ExtURL implements Serializable {
 
     private final String path;
 
-    /**  */
+    /**
+     *
+     */
     private final Map<String, String> parameters;
 
     private volatile transient String string;

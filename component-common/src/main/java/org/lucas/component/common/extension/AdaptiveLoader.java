@@ -1,4 +1,4 @@
-package org.lucas.extension;
+package org.lucas.component.common.extension;
 
 import org.lucas.component.common.compiler.Compiler;
 import org.lucas.component.common.util.ClassUtils;
@@ -39,7 +39,7 @@ public abstract class AdaptiveLoader extends AbstractLoader {
     private Class<?> createAdaptiveExtensionClass() {
         String code = createAdaptiveExtensionClassCode();
         ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
-        Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class)
+        Compiler compiler = getExtensionLoader(Compiler.class)
                 .getAdaptiveExtension();
         return compiler.compile(code, classLoader);
     }

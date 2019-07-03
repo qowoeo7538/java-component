@@ -37,7 +37,7 @@ public abstract class ClassUtils {
 
     public static String getTypeStr(Class clazz) {
         String str = TYPE_STR_CACHE.get(clazz);
-        if (org.springframework.util.StringUtils.isEmpty(str)) {
+        if (StringUtils.isEmpty(str)) {
 
         }
         return "";

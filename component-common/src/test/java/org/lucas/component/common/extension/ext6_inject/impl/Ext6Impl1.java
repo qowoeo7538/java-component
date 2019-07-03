@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.lucas.component.common.extension.ext1.SimpleExt;
 import org.lucas.component.common.extension.ext6_inject.Dao;
 import org.lucas.component.common.extension.ext6_inject.Ext6;
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 
 public class Ext6Impl1 implements Ext6 {
 

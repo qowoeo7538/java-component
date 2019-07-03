@@ -1,10 +1,10 @@
-package org.lucas.extension.factory;
+package org.lucas.component.common.extension.factory;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.ExtensionFactory;
-import org.lucas.extension.ExtensionLoader;
+import org.lucas.component.common.extension.Adaptive;
+import org.lucas.component.common.extension.ExtensionFactory;
+import org.lucas.component.common.extension.ExtensionLoader;
 
 import java.util.Collections;
 import java.util.List;

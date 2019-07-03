@@ -17,7 +17,7 @@
 package org.lucas.component.common.extension.ext1.impl;
 
 import org.lucas.component.common.extension.ext1.SimpleExt;
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 
 public class SimpleExtImpl3 implements SimpleExt {
     public String echo(ExtURL url, String s) {

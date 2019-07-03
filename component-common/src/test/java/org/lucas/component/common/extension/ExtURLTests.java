@@ -1,7 +1,6 @@
 package org.lucas.component.common.extension;
 
 import org.junit.Test;
-import org.lucas.extension.ExtURL;
 
 import java.util.HashMap;
 import java.util.Map;

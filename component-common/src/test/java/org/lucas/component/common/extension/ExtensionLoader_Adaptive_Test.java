@@ -8,8 +8,6 @@ import org.lucas.component.common.extension.ext2.Ext2;
 import org.lucas.component.common.extension.ext2.UrlHolder;
 import org.lucas.component.common.extension.ext3.UseProtocolKeyExt;
 import org.lucas.component.common.extension.ext4.NoUrlParamExt;
-import org.lucas.extension.ExtURL;
-import org.lucas.extension.ExtensionLoader;
 import org.lucas.component.common.extension.adaptive.HasAdaptiveExt;
 import org.lucas.component.common.extension.adaptive.impl.HasAdaptiveExtManualAdaptive;
 import org.lucas.component.common.extension.ext6_inject.Ext6;

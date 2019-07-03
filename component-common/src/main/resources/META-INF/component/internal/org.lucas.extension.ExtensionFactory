@@ -1,2 +1,2 @@
-adaptive=org.lucas.extension.factory.AdaptiveExtensionFactory
-spi=org.lucas.extension.factory.SpiExtensionFactory
+adaptive=AdaptiveExtensionFactory
+spi=SpiExtensionFactory

@@ -16,8 +16,8 @@
  */
 package org.lucas.component.common.extension.ext4;
 
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.Adaptive;
+import org.lucas.component.common.extension.SPI;
 
 import java.util.List;
 

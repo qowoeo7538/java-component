@@ -1,4 +1,4 @@
-package org.lucas.extension;
+package org.lucas.component.common.extension;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

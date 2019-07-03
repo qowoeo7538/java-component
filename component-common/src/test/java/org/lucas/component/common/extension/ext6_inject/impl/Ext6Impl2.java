@@ -1,7 +1,7 @@
 package org.lucas.component.common.extension.ext6_inject.impl;
 
 import org.lucas.component.common.extension.ext6_inject.Ext6;
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 
 import java.util.List;
 

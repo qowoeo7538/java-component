@@ -16,7 +16,7 @@
  */
 package org.lucas.component.common.extension.ext1.impl;
 
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 import org.lucas.component.common.extension.ext1.SimpleExt;
 
 public class SimpleExtImpl1 implements SimpleExt {

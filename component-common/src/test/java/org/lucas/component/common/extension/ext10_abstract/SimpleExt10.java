@@ -1,6 +1,6 @@
 package org.lucas.component.common.extension.ext10_abstract;
 
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.SPI;
 
 /**
  * @create: 2018-06-22

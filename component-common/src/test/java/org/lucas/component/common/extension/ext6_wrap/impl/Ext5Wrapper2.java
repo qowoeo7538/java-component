@@ -1,7 +1,7 @@
 package org.lucas.component.common.extension.ext6_wrap.impl;
 
 
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 import org.lucas.component.common.extension.ext6_wrap.WrappedExt;
 
 import java.util.concurrent.atomic.AtomicInteger;

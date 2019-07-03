@@ -1,6 +1,6 @@
-package org.lucas.logger.jdk;
+package org.lucas.component.common.logger.jdk;
 
-import org.lucas.logger.Logger;
+import org.lucas.component.common.logger.Logger;
 
 import java.util.logging.Level;
 

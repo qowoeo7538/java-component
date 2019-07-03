@@ -1,7 +1,7 @@
 package org.lucas.component.common.extension.ext6_wrap;
 
-import org.lucas.extension.ExtURL;
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.ExtURL;
+import org.lucas.component.common.extension.SPI;
 
 /**
  * No Adaptive Method!!

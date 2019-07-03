@@ -3,10 +3,7 @@ package org.lucas.component.common.logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.lucas.logger.Level;
-import org.lucas.logger.Logger;
-import org.lucas.logger.LoggerAdapter;
-import org.lucas.logger.jdk.JdkLoggerAdapter;
+import org.lucas.component.common.logger.jdk.JdkLoggerAdapter;
 
 import java.util.Arrays;
 import java.util.Collection;

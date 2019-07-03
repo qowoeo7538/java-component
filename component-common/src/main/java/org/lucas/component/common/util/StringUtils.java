@@ -1,6 +1,8 @@
 package org.lucas.component.common.util;
 
 
+import org.springframework.lang.Nullable;
+
 /**
  * @create: 2018-06-01
  * @description:
@@ -35,6 +37,10 @@ public abstract class StringUtils {
             }
         }
         return buf == null ? camelName : buf.toString();
+    }
+
+    public static boolean isEmpty(@Nullable Object str) {
+        return (str == null || "".equals(str));
     }
 
 }

@@ -1,6 +1,6 @@
-package org.lucas.logger;
+package org.lucas.component.common.logger;
 
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.SPI;
 
 import java.io.File;
 

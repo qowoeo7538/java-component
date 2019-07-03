@@ -1,10 +1,10 @@
-package org.lucas.extension;
+package org.lucas.component.common.extension;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.lucas.component.common.core.Constants;
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
-import org.lucas.extension.support.ActivateComparator;
+import org.lucas.component.common.extension.support.ActivateComparator;
 import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.ConfigUtils;
 import org.lucas.component.common.util.ExceptionUtils;

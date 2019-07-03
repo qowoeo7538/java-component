@@ -1,4 +1,4 @@
-package org.lucas.extension;
+package org.lucas.component.common.extension;
 
 @SPI
 public interface ExtensionFactory {

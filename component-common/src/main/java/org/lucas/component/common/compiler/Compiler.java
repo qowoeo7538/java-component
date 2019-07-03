@@ -1,6 +1,6 @@
 package org.lucas.component.common.compiler;
 
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.SPI;
 
 /**
  * @create: 2018-03-04

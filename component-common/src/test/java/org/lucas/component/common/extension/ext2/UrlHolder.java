@@ -1,6 +1,6 @@
 package org.lucas.component.common.extension.ext2;
 
-import org.lucas.extension.ExtURL;
+import org.lucas.component.common.extension.ExtURL;
 
 public class UrlHolder {
     private Double Num;

@@ -1,9 +1,9 @@
 package org.lucas.component.common.extension.ext8_add.impl;
 
 import org.lucas.component.common.extension.ext8_add.AddExt3;
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.ExtURL;
-import org.lucas.extension.ExtensionLoader;
+import org.lucas.component.common.extension.Adaptive;
+import org.lucas.component.common.extension.ExtURL;
+import org.lucas.component.common.extension.ExtensionLoader;
 
 @Adaptive
 public class AddExt3_ManualAdaptive implements AddExt3 {

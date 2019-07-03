@@ -1,8 +1,8 @@
 package org.lucas.component.common.extension.ext3;
 
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.ExtURL;
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.Adaptive;
+import org.lucas.component.common.extension.ExtURL;
+import org.lucas.component.common.extension.SPI;
 
 /**
  * @create: 2018-06-08

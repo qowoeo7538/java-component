@@ -1,4 +1,4 @@
-package org.lucas.logger;
+package org.lucas.component.common.logger;
 
 public enum Level {
     /**

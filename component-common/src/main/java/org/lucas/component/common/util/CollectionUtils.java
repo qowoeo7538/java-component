@@ -27,4 +27,8 @@ public abstract class CollectionUtils {
         return parameters;
     }
 
+    public static boolean isEmpty(Map<?, ?> map) {
+        return (map == null || map.isEmpty());
+    }
+
 }

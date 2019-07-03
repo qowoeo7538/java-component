@@ -7,8 +7,6 @@ import org.lucas.component.common.extension.ext1.SimpleExt;
 import org.lucas.component.common.extension.ext1.impl.SimpleExtImpl1;
 import org.lucas.component.common.extension.ext1.impl.SimpleExtImpl2;
 import org.lucas.component.common.extension.ext2.Ext2;
-import org.lucas.extension.ExtURL;
-import org.lucas.extension.ExtensionLoader;
 import org.lucas.component.common.extension.activate.ActivateExt1;
 import org.lucas.component.common.extension.activate.impl.ActivateExt1Impl1;
 import org.lucas.component.common.extension.activate.impl.GroupActivateExtImpl;

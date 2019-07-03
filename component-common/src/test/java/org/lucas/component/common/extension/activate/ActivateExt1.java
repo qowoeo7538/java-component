@@ -1,6 +1,6 @@
 package org.lucas.component.common.extension.activate;
 
-import org.lucas.extension.SPI;
+import org.lucas.component.common.extension.SPI;
 
 @SPI("impl1")
 public interface ActivateExt1 {

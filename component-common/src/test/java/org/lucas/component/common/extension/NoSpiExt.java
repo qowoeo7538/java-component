@@ -16,9 +16,6 @@
  */
 package org.lucas.component.common.extension;
 
-import org.lucas.extension.Adaptive;
-import org.lucas.extension.ExtURL;
-
 /**
  * Has no SPI annotation
  */
