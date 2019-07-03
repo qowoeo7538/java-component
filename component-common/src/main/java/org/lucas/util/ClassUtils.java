@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Class 工具类
  */
-public abstract class ClassUtils extends org.springframework.util.ClassUtils {
+public abstract class ClassUtils {
 
     /** The package separator String: "." */
     public static final String PACKAGE_SEPARATOR = ".";
@@ -33,7 +33,7 @@ public abstract class ClassUtils extends org.springframework.util.ClassUtils {
         return "";
     }
 
-    public static String[] getTypeStrs(Class[] types) {
+    public static String[] getTypeStrs(Class... types) {
         return null;
     }
 
@@ -69,13 +69,13 @@ public abstract class ClassUtils extends org.springframework.util.ClassUtils {
      */
     public static Class<?> forName(final String[] packages, final String className, final ClassLoader classLoader) {
         try {
-            return forName(className, classLoader);
+            return org.springframework.util.ClassUtils.forName(className, classLoader);
         } catch (final ClassNotFoundException e) {
             if (packages != null && packages.length > 0) {
                 // 匹配所有的导入包,尝试加载
                 for (String pkg : packages) {
                     try {
-                        return forName(pkg + PACKAGE_SEPARATOR + className, classLoader);
+                        return org.springframework.util.ClassUtils.forName(pkg + PACKAGE_SEPARATOR + className, classLoader);
                     } catch (ClassNotFoundException e2) {
                     }
                 }
