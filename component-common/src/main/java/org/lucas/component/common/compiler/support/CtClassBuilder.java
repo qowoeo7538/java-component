@@ -8,7 +8,7 @@ import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
-import org.lucas.util.ClassUtils;
+import org.lucas.component.common.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

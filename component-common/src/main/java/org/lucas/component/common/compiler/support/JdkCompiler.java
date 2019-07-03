@@ -1,8 +1,8 @@
 package org.lucas.component.common.compiler.support;
 
-import org.lucas.util.ClassUtils;
-import org.lucas.util.ConfigUtils;
-import org.lucas.util.ResourceUtils;
+import org.lucas.component.common.util.ClassUtils;
+import org.lucas.component.common.util.ConfigUtils;
+import org.lucas.component.common.util.ResourceUtils;
 
 import javax.tools.*;
 import java.io.*;

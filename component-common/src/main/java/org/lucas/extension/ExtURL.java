@@ -1,9 +1,9 @@
 package org.lucas.extension;
 
-import org.lucas.core.Constants;
-import org.lucas.util.CollectionUtils;
-import org.lucas.util.StringUtils;
-import org.lucas.util.NetUtils;
+import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.util.CollectionUtils;
+import org.lucas.component.common.util.StringUtils;
+import org.lucas.component.common.util.NetUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;

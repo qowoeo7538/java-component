@@ -2,7 +2,7 @@ package org.lucas.task;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.lucas.core.Constants;
+import org.lucas.component.common.core.Constants;
 import org.lucas.task.support.AbortPolicyWithReport;
 import org.lucas.task.support.AfterFunction;
 import org.lucas.task.support.BeforeFunction;

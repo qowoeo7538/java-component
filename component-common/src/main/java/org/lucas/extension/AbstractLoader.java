@@ -1,6 +1,6 @@
 package org.lucas.extension;
 
-import org.lucas.util.Holder;
+import org.lucas.component.common.util.Holder;
 
 import java.lang.reflect.Modifier;
 import java.util.Map;

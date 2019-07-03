@@ -2,14 +2,14 @@ package org.lucas.extension;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.lucas.core.Constants;
-import org.lucas.core.collect.ConcurrentHashSet;
+import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.core.collect.ConcurrentHashSet;
 import org.lucas.extension.support.ActivateComparator;
-import org.lucas.util.ClassUtils;
-import org.lucas.util.ConfigUtils;
-import org.lucas.util.ExceptionUtils;
-import org.lucas.util.Holder;
-import org.lucas.util.StringUtils;
+import org.lucas.component.common.util.ClassUtils;
+import org.lucas.component.common.util.ConfigUtils;
+import org.lucas.component.common.util.ExceptionUtils;
+import org.lucas.component.common.util.Holder;
+import org.lucas.component.common.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

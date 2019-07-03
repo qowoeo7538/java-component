@@ -1,2 +1,2 @@
-impl1=org.lucas.extension.ext6_inject.impl.Ext6Impl1
-impl2=org.lucas.extension.ext6_inject.impl.Ext6Impl2
+impl1=Ext6Impl1
+impl2=Ext6Impl2

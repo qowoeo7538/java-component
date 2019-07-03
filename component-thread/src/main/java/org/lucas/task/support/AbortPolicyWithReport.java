@@ -2,9 +2,9 @@ package org.lucas.task.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lucas.core.Constants;
-import org.lucas.util.StreamUtils;
-import org.lucas.util.ThreadInfoUtils;
+import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.util.StreamUtils;
+import org.lucas.component.common.util.ThreadInfoUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

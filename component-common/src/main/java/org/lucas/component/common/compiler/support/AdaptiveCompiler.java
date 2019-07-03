@@ -3,7 +3,7 @@ package org.lucas.component.common.compiler.support;
 import org.lucas.component.common.compiler.Compiler;
 import org.lucas.extension.Adaptive;
 import org.lucas.extension.ExtensionLoader;
-import org.lucas.util.StringUtils;
+import org.lucas.component.common.util.StringUtils;
 
 /**
  * @create: 2018-03-15
@@ -38,7 +38,7 @@ public class AdaptiveCompiler implements Compiler {
         Compiler compiler;
         final ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
         final String name = DEFAULT_COMPILER;
-        if (StringUtils.isEmpty(name)) {
+        if (org.springframework.util.StringUtils.isEmpty(name)) {
             // 默认编译器 javassist.
             compiler = loader.getDefaultExtension();
         } else {

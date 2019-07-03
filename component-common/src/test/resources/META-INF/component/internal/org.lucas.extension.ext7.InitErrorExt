@@ -1,2 +1,2 @@
-error=org.lucas.extension.ext7.impl.Ext7InitErrorImpl
-ok=org.lucas.extension.ext7.impl.Ext7Impl
+error=Ext7InitErrorImpl
+ok=Ext7Impl

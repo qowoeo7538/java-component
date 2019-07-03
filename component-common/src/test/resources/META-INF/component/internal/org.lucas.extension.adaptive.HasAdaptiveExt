@@ -1,2 +1,2 @@
-adaptive=org.lucas.extension.adaptive.impl.HasAdaptiveExtManualAdaptive
-impl=org.lucas.extension.adaptive.impl.HasAdaptiveExtImpl
+adaptive=HasAdaptiveExtManualAdaptive
+impl=HasAdaptiveExtImpl

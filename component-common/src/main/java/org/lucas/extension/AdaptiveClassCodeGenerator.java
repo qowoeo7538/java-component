@@ -1,6 +1,6 @@
 package org.lucas.extension;
 
-import org.lucas.util.StringUtils;
+import org.lucas.component.common.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

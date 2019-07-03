@@ -1,7 +1,7 @@
 package org.lucas.component.common.compiler.support;
 
 import javassist.CtClass;
-import org.lucas.util.ClassUtils;
+import org.lucas.component.common.util.ClassUtils;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
