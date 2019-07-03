@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
  * @create: 2018-05-18
  * @description:
  */
-public abstract class ResourceUtils extends org.springframework.util.ResourceUtils {
+public abstract class ResourceUtils {
 
     public static URI toURI(final String location) {
         try {

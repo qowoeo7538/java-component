@@ -1,4 +1,4 @@
-package org.lucas.compiler;
+package org.lucas.component.common.compiler;
 
 import org.lucas.extension.SPI;
 

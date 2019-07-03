@@ -1,39 +1,17 @@
-package org.lucas.compiler.support;
+package org.lucas.component.common.compiler.support;
 
 import org.lucas.util.ClassUtils;
 import org.lucas.util.ConfigUtils;
 import org.lucas.util.ResourceUtils;
 
-import javax.tools.DiagnosticCollector;
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.tools.*;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * JDK动态编译
@@ -80,7 +58,7 @@ public class JdkCompiler extends AbstractCompiler {
          *   2) 在多个编译任务之间共享
          */
         final StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-        final ClassLoader loader = ClassUtils.getDefaultClassLoader();
+        final ClassLoader loader = org.springframework.util.ClassUtils.getDefaultClassLoader();
         /**
          * 1) 是 URLClassLoader 加载器的实例(通过指向目标文件加载类)
          * 2) 不是默认的类加载器
@@ -165,7 +143,7 @@ public class JdkCompiler extends AbstractCompiler {
                 return defineClass(name, bytes, 0, bytes.length);
             }
             try {
-                return ClassUtils.forName(name, getClass().getClassLoader());
+                return org.springframework.util.ClassUtils.forName(name, getClass().getClassLoader());
             } catch (ClassNotFoundException nf) {
                 return super.findClass(name);
             }
@@ -202,10 +180,10 @@ public class JdkCompiler extends AbstractCompiler {
          */
         @Override
         public InputStream getResourceAsStream(final String name) {
-            if (name.endsWith(ClassUtils.CLASS_FILE_SUFFIX)) {
+            if (name.endsWith(org.springframework.util.ClassUtils.CLASS_FILE_SUFFIX)) {
                 // 获取类全名
                 String qualifiedClassName = name.substring(0,
-                        name.length() - ClassUtils.CLASS_FILE_SUFFIX.length()).replace('/', '.');
+                        name.length() - org.springframework.util.ClassUtils.CLASS_FILE_SUFFIX.length()).replace('/', '.');
                 // 通过类全名获取 JavaFileObjectImpl
                 JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
                 if (file != null) {
@@ -405,7 +383,7 @@ public class JdkCompiler extends AbstractCompiler {
         public Iterable<JavaFileObject> list(Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse)
                 throws IOException {
             Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
-            ClassLoader contextClassLoader = ClassUtils.getDefaultClassLoader();
+            ClassLoader contextClassLoader = org.springframework.util.ClassUtils.getDefaultClassLoader();
             List<URL> urlList = new ArrayList<>();
             // 加载URL目录
             Enumeration<URL> e = contextClassLoader.getResources("org");

@@ -1,4 +1,4 @@
-package org.lucas.compiler.support;
+package org.lucas.component.common.compiler.support;
 
 import javassist.CtClass;
 import org.lucas.util.ClassUtils;
@@ -66,7 +66,7 @@ public class JavassistCompiler extends AbstractCompiler {
         // 处理构造函数,属性字段,方法信息.
         String body = source.substring(source.indexOf('{') + 1, source.length() - 1);
         String[] methods = METHODS_PATTERN.split(body);
-        String className = ClassUtils.getShortName(name);
+        String className = org.springframework.util.ClassUtils.getShortName(name);
         Arrays.stream(methods).map(String::trim).filter(m -> !m.isEmpty()).forEach(method -> {
             if (method.startsWith(className)) {
                 builder.addConstructor("public " + method);

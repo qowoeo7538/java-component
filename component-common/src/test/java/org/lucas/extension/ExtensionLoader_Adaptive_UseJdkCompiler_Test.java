@@ -18,7 +18,7 @@ package org.lucas.extension;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.lucas.compiler.support.AdaptiveCompiler;
+import org.lucas.component.common.compiler.support.AdaptiveCompiler;
 
 public class ExtensionLoader_Adaptive_UseJdkCompiler_Test extends ExtensionLoader_Adaptive_Test {
 

@@ -1,6 +1,6 @@
-package org.lucas.compiler.support;
+package org.lucas.component.common.compiler.support;
 
-import org.lucas.compiler.Compiler;
+import org.lucas.component.common.compiler.Compiler;
 import org.lucas.extension.Adaptive;
 import org.lucas.extension.ExtensionLoader;
 import org.lucas.util.StringUtils;

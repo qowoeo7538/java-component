@@ -2,7 +2,6 @@ package org.lucas.extension;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
-import org.lucas.compiler.Compiler;
 import org.lucas.core.Constants;
 import org.lucas.core.collect.ConcurrentHashSet;
 import org.lucas.extension.support.ActivateComparator;

@@ -7,7 +7,7 @@ import java.util.Map;
  * @create: 2018-03-14
  * @description:
  */
-public abstract class CollectionUtils extends org.springframework.util.CollectionUtils {
+public abstract class CollectionUtils {
 
     /**
      * 将偶数个 String 转换成 Map 对象

@@ -1,4 +1,4 @@
-package org.lucas.compiler.support;
+package org.lucas.component.common.compiler.support;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;

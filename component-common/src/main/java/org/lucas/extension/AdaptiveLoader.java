@@ -1,6 +1,6 @@
 package org.lucas.extension;
 
-import org.lucas.compiler.Compiler;
+import org.lucas.component.common.compiler.Compiler;
 import org.lucas.util.ClassUtils;
 
 import java.lang.annotation.Annotation;

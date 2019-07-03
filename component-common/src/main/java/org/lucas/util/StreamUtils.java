@@ -18,7 +18,7 @@ import java.util.Base64;
 /**
  * io工具类
  */
-public abstract class StreamUtils extends org.springframework.util.StreamUtils {
+public abstract class StreamUtils {
 
     /**
      * 通道处理工具类
