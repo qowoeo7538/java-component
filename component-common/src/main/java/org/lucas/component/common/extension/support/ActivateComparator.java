@@ -1,7 +1,6 @@
 package org.lucas.component.common.extension.support;
 
 import org.lucas.component.common.extension.ExtensionLoader;
-import org.lucas.component.common.extension.Activate;
 import org.lucas.component.common.extension.SPI;
 
 import java.util.Comparator;

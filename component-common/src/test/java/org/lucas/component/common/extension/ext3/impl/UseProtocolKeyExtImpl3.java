@@ -17,7 +17,6 @@
 package org.lucas.component.common.extension.ext3.impl;
 
 import org.lucas.component.common.extension.ext3.UseProtocolKeyExt;
-import org.lucas.component.common.extension.ExtURL;
 
 public class UseProtocolKeyExtImpl3 implements UseProtocolKeyExt {
 

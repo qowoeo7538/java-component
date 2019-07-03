@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 /**
  * 通过动态编译进行适配加载
  */
-public abstract class AdaptiveLoader extends AbstractLoader {
+public abstract class AdaptiveLoader {
 
     /**
      * 适配的类注解
