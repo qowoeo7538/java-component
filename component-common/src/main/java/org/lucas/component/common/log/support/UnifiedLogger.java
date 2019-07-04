@@ -1,6 +1,6 @@
-package org.lucas.component.common.logger.support;
+package org.lucas.component.common.log.support;
 
-import org.lucas.component.common.logger.Logger;
+import org.lucas.component.common.log.Logger;
 
 public class UnifiedLogger implements Logger {
 

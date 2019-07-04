@@ -1,7 +1,7 @@
-package org.lucas.component.common.logger;
+package org.lucas.component.common.log;
 
-import org.lucas.component.common.logger.jdk.JdkLoggerAdapter;
-import org.lucas.component.common.logger.support.UnifiedLogger;
+import org.lucas.component.common.log.jdk.JdkLoggerAdapter;
+import org.lucas.component.common.log.support.UnifiedLogger;
 
 import java.util.Iterator;
 import java.util.Map;

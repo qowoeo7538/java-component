@@ -1,9 +1,9 @@
-package org.lucas.component.common.logger;
+package org.lucas.component.common.log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.lucas.component.common.logger.jdk.JdkLoggerAdapter;
+import org.lucas.component.common.log.jdk.JdkLoggerAdapter;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package org.lucas.component.common.logger;
+package org.lucas.component.common.log;
 
 public interface Logger {
     /**
