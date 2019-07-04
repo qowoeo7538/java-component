@@ -1,0 +1,4 @@
+group=org.lucas.component.common.extension.activate.impl.GroupActivateExtImpl
+value=org.lucas.component.common.extension.activate.impl.ValueActivateExtImpl
+order1=org.lucas.component.common.extension.activate.impl.OrderActivateExtImpl1
+order2=org.lucas.component.common.extension.activate.impl.OrderActivateExtImpl2

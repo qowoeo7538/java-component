@@ -1,4 +1,0 @@
-# Comment 1
-impl1=SimpleExtImpl1#Hello World
-impl2=SimpleExtImpl2  # Comment 2
-   impl3=SimpleExtImpl3 # with head space

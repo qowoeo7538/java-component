@@ -39,11 +39,6 @@ public class ExtensionLoader<T> {
 
     // =============================
 
-    /**
-     * Map:{别名 -> 类的 @Activate 信息}
-     */
-    private final Map<String, Object> cachedActivates = new ConcurrentHashMap<>();
-
     private final ConcurrentMap<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>();
 
     private final ExtensionFactory objectFactory;
@@ -96,12 +91,6 @@ public class ExtensionLoader<T> {
      * 自定义 SPI 目录
      */
     private static final String INTERNAL_DIRECTORY = DIRECTORY + "internal/";
-
-    /**
-     * 构建过的对象, 将保存到该对象中进行缓存 Map:{Class 对象 -> ExtensionLoader}
-     */
-    private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
-
 
     /**
      * {@code Holder} 维护一个 Map:{type 实现类的别名 -> 实现类的 Class}
@@ -387,130 +376,6 @@ public class ExtensionLoader<T> {
         ClassLoader classLoader = ClassUtils.getCallerClassLoader(ExtensionLoader.class);
         Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class).getAdaptiveExtension();
         return compiler.compile(code, classLoader);
-    }
-
-
-    /**
-     * 通过反射获取 {@link #type} 的源代码
-     *
-     * @return Source code
-     */
-    private String createAdaptiveExtensionClassCode() {
-        StringBuilder codeBuilder = new StringBuilder();
-        Method[] methods = type.getMethods();
-        boolean hasAdaptiveAnnotation = false;
-        for (Method m : methods) {
-            if (m.isAnnotationPresent(Adaptive.class)) {
-                hasAdaptiveAnnotation = true;
-                break;
-            }
-        }
-
-        if (!hasAdaptiveAnnotation) {
-            throw new IllegalStateException("No adaptive method on extension " + type.getName()
-                    + ", refuse to create the adaptive class!");
-        }
-
-        /**
-         * 生成 SPI 接口的内部 Adaptive 类
-         *
-         * package           : SPI 接口包名
-         * import            : org.lucas.core.extension.ExtensionLoader
-         * class 描述        : public class {@code type.getSimpleName()}$Adaptive implements {@code type.getCanonicalName()}
-         */
-        codeBuilder.append("package " + type.getPackage().getName() + ";");
-        codeBuilder.append("\nimport " + ExtensionLoader.class.getName() + ";");
-        codeBuilder.append("\npublic class " + type.getSimpleName() + "$Adaptive" + " implements "
-                + type.getCanonicalName() + " {");
-        // private AtomicInteger count = new AtomicInteger(0);
-        codeBuilder.append("\nprivate java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(0);\n");
-
-        for (Method method : methods) {
-            // 获取返回类型
-            Class<?> rt = method.getReturnType();
-            // 获取参数类型
-            Class<?>[] pts = method.getParameterTypes();
-            // 获取方法异常类型
-            Class<?>[] ets = method.getExceptionTypes();
-
-            Adaptive adaptiveAnnotation = method.getAnnotation(Adaptive.class);
-            StringBuilder code = new StringBuilder(512);
-            if (adaptiveAnnotation == null) {
-                code.append("throw new UnsupportedOperationException(\"method ")
-                        .append(method.toString()).append(" of interface ")
-                        .append(type.getName()).append(" is not adaptive method!\");");
-            } else {
-                String[] value = adaptiveAnnotation.value();
-                // 默认 value
-                if (value.length == 0) {
-                    String splitName = StringUtils.camelToSplitName(type.getSimpleName(), ".");
-                    value = new String[]{splitName};
-                }
-
-                String defaultExtName = cachedDefaultName;
-                String getNameCode = null;
-                for (int i = value.length - 1; i >= 0; --i) {
-                    if (i == value.length - 1) {
-                        if (null != defaultExtName) {
-                            getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
-                        } else {
-                            getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
-                        }
-                    } else {
-                        getNameCode = String.format("url.getParameter(\"%s\", %s)", value[i], getNameCode);
-                    }
-                }
-                code.append("\nString extName = ").append(getNameCode).append(";");
-                String s = String.format("\nif(extName == null) " +
-                                "throw new IllegalStateException(\"Fail to get extension(%s) name from url(\" + url.toString() + \") use keys(%s)\");",
-                        type.getName(), Arrays.toString(value));
-                code.append(s);
-
-                code.append(String.format("\n%s extension = null;\n try {\nextension = (%<s)%s.getExtensionLoader(%s.class).getExtension(extName);\n}catch(Exception e){\n",
-                        type.getName(), ExtensionLoader.class.getSimpleName(), type.getName()));
-                code.append(String.format("extension = (%s)%s.getExtensionLoader(%s.class).getExtension(\"%s\");\n}",
-                        type.getName(), ExtensionLoader.class.getSimpleName(), type.getName(), defaultExtName));
-
-                if (!rt.equals(void.class)) {
-                    code.append("\nreturn ");
-                }
-
-                s = String.format("extension.%s(", method.getName());
-                code.append(s);
-                for (int i = 0; i < pts.length; i++) {
-                    if (i != 0) {
-                        code.append(", ");
-                    }
-                    code.append("arg").append(i);
-                }
-                code.append(");");
-            }
-
-            codeBuilder.append("\npublic " + rt.getCanonicalName() + " " + method.getName() + "(");
-            for (int i = 0; i < pts.length; i++) {
-                if (i > 0) {
-                    codeBuilder.append(", ");
-                }
-                codeBuilder.append(pts[i].getCanonicalName());
-                codeBuilder.append(" ");
-                codeBuilder.append("arg" + i);
-            }
-            codeBuilder.append(")");
-            if (ets.length > 0) {
-                codeBuilder.append(" throws ");
-                for (int i = 0; i < ets.length; i++) {
-                    if (i > 0) {
-                        codeBuilder.append(", ");
-                    }
-                    codeBuilder.append(ets[i].getCanonicalName());
-                }
-            }
-            codeBuilder.append(" {");
-            codeBuilder.append(code.toString());
-            codeBuilder.append("\n}");
-        }
-        codeBuilder.append("\n}");
-        return codeBuilder.toString();
     }
 
     /**
