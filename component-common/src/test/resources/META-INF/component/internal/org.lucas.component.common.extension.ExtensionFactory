@@ -1,2 +1,0 @@
-adaptive=org.lucas.component.common.extension.factory.AdaptiveExtensionFactory
-spi=org.lucas.component.common.extension.factory.SpiExtensionFactory

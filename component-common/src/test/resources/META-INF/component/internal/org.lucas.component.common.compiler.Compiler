@@ -1,3 +1,0 @@
-adaptive=org.lucas.component.common.compiler.support.AdaptiveCompiler
-jdk=org.lucas.component.common.compiler.support.JdkCompiler
-javassist=org.lucas.component.common.compiler.support.JavassistCompiler

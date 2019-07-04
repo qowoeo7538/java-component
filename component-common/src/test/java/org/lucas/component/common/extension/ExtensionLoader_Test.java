@@ -24,7 +24,8 @@ public class ExtensionLoader_Test {
 
     @Test
     public void test_getAbstractExtension() throws Exception {
-        SimpleExt10 ext = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtension();
+        ExtensionLoader<SimpleExt10> loader = ExtensionLoader.getExtensionLoader(SimpleExt10.class);
+        SimpleExt10 ext = loader.getDefaultExtension();
         assertThat(ext, instanceOf(SimpleExt10.class));
         assertEquals("abstract-print\nimpl1-call", ext.print());
 
