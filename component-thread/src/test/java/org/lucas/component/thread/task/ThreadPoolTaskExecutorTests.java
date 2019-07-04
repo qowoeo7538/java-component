@@ -2,8 +2,7 @@ package org.lucas.component.thread.task;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.junit.Test;
-import org.lucas.component.thread.task.ThreadPoolTaskExecutor;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 import java.util.Random;
