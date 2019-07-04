@@ -1,6 +1,5 @@
 package org.lucas.component.common.extension;
 
-import org.lucas.component.common.compiler.Compiler;
 import org.lucas.component.common.core.Constants;
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
 import org.lucas.component.common.util.ClassUtils;
@@ -365,17 +364,7 @@ public class ExtensionLoader<T> {
 
     private Class<?> getAdaptiveExtensionClass() {
         getExtensionClasses();
-        if (cachedAdaptiveClass != null) {
-            return cachedAdaptiveClass;
-        }
-        return cachedAdaptiveClass = createAdaptiveExtensionClass();
-    }
-
-    private Class<?> createAdaptiveExtensionClass() {
-        String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();
-        ClassLoader classLoader = ClassUtils.getCallerClassLoader(ExtensionLoader.class);
-        Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class).getAdaptiveExtension();
-        return compiler.compile(code, classLoader);
+        return cachedAdaptiveClass;
     }
 
     /**
