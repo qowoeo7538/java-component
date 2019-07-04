@@ -1,7 +1,7 @@
 package org.lucas.component.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
 
@@ -22,55 +22,55 @@ public class ClassUtils_Tests {
     @Test
     public void testGetTypeStr() {
 
-        Assert.assertEquals(ClassUtils.getTypeStr(String.class), "java.lang.String");
+        Assertions.assertEquals(ClassUtils.getTypeStr(String.class), "java.lang.String");
 
-        Assert.assertEquals(ClassUtils.getTypeStr(boolean.class), "boolean");
-        Assert.assertEquals(ClassUtils.getTypeStr(byte.class), "byte");
-        Assert.assertEquals(ClassUtils.getTypeStr(char.class), "char");
-        Assert.assertEquals(ClassUtils.getTypeStr(double.class), "double");
-        Assert.assertEquals(ClassUtils.getTypeStr(float.class), "float");
-        Assert.assertEquals(ClassUtils.getTypeStr(int.class), "int");
-        Assert.assertEquals(ClassUtils.getTypeStr(long.class), "long");
-        Assert.assertEquals(ClassUtils.getTypeStr(short.class), "short");
-        Assert.assertEquals(ClassUtils.getTypeStr(void.class), "void");
+        Assertions.assertEquals(ClassUtils.getTypeStr(boolean.class), "boolean");
+        Assertions.assertEquals(ClassUtils.getTypeStr(byte.class), "byte");
+        Assertions.assertEquals(ClassUtils.getTypeStr(char.class), "char");
+        Assertions.assertEquals(ClassUtils.getTypeStr(double.class), "double");
+        Assertions.assertEquals(ClassUtils.getTypeStr(float.class), "float");
+        Assertions.assertEquals(ClassUtils.getTypeStr(int.class), "int");
+        Assertions.assertEquals(ClassUtils.getTypeStr(long.class), "long");
+        Assertions.assertEquals(ClassUtils.getTypeStr(short.class), "short");
+        Assertions.assertEquals(ClassUtils.getTypeStr(void.class), "void");
 
         // 本地类
         class LocalType {
 
         }
 
-        Assert.assertEquals(ClassUtils.getTypeStr(anonymous.getClass()),
+        Assertions.assertEquals(ClassUtils.getTypeStr(anonymous.getClass()),
                 "org.lucas.util.ClassTypeUtilsTest$1");
-        Assert.assertEquals(ClassUtils.getTypeStr(LocalType.class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(LocalType.class),
                 "org.lucas.util.ClassTypeUtilsTest$2LocalType");
-        Assert.assertEquals(ClassUtils.getTypeStr(MemberClass.class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(MemberClass.class),
                 "org.lucas.util.ClassTypeUtilsTest$MemberClass");
-        Assert.assertEquals(ClassUtils.getTypeStr(StaticClass.class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(StaticClass.class),
                 "StaticClass");
 
-        Assert.assertEquals(ClassUtils.getTypeStr(String[][][].class), "java.lang.String[][][]");
-        Assert.assertEquals(ClassUtils.getTypeStr(boolean[].class), "boolean[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(byte[].class), "byte[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(char[].class), "char[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(double[].class), "double[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(float[].class), "float[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(int[].class), "int[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(long[].class), "long[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(short[].class), "short[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(Array.newInstance(anonymous.getClass(), 2, 3).getClass()),
+        Assertions.assertEquals(ClassUtils.getTypeStr(String[][][].class), "java.lang.String[][][]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(boolean[].class), "boolean[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(byte[].class), "byte[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(char[].class), "char[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(double[].class), "double[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(float[].class), "float[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(int[].class), "int[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(long[].class), "long[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(short[].class), "short[]");
+        Assertions.assertEquals(ClassUtils.getTypeStr(Array.newInstance(anonymous.getClass(), 2, 3).getClass()),
                 "org.lucas.util.ClassTypeUtilsTest$1[][]");
-        Assert.assertEquals(ClassUtils.getTypeStr(LocalType[][].class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(LocalType[][].class),
                 "org.lucas.util.ClassTypeUtilsTest$2LocalType[][]");
-        Assert.assertEquals(ClassUtils.getTypeStr(MemberClass[].class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(MemberClass[].class),
                 "org.lucas.util.ClassTypeUtilsTest$MemberClass[]");
-        Assert.assertEquals(ClassUtils.getTypeStr(StaticClass[].class),
+        Assertions.assertEquals(ClassUtils.getTypeStr(StaticClass[].class),
                 "StaticClass[]");
 
-        Assert.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}),
+        Assertions.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}),
                 new String[]{"java.lang.String[]"});
-        Assert.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}, false),
+        Assertions.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}, false),
                 new String[]{"java.lang.String[]"});
-        Assert.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}, true),
+        Assertions.assertArrayEquals(ClassUtils.getTypeStrs(new Class[]{String[].class}, true),
                 new String[]{String[].class.getName()});
 
     }

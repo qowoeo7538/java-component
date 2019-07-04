@@ -1,7 +1,6 @@
 package org.lucas.component.common.util;
 
-import org.junit.Test;
-import org.lucas.component.common.util.StringUtils;
+import org.junit.jupiter.api.Test;
 
 public class StringUtils_Tests {
 

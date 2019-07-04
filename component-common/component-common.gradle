@@ -6,7 +6,7 @@ dependencies {
     compile("com.lmax:disruptor:3.4.2")
     compile("org.springframework:spring-core")
     compile("org.springframework:spring-context")
-    compile("org.javassist:javassist:${javassistVersion}")
+    compile("org.javassist:javassist:${javassist_version}")
     compile("ch.qos.logback:logback-core:${logbackVersion}")
     compile("ch.qos.logback:logback-classic:${logbackVersion}")
 }

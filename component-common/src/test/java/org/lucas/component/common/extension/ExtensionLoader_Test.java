@@ -1,14 +1,14 @@
 package org.lucas.component.common.extension;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.lucas.component.common.extension.ext10_abstract.SimpleExt10;
 import org.lucas.component.common.extension.ext9_empty.Ext9Empty;
 import org.lucas.component.common.extension.ext9_empty.impl.Ext9EmptyImpl;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class ExtensionLoader_Test {
 
@@ -26,7 +26,7 @@ public class ExtensionLoader_Test {
     public void test_getAbstractExtension() throws Exception {
         SimpleExt10 ext = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtension();
         assertThat(ext, instanceOf(SimpleExt10.class));
-        Assert.assertEquals("abstract-print\nimpl1-call", ext.print());
+        assertEquals("abstract-print\nimpl1-call", ext.print());
 
         String name = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtensionName();
         assertEquals("impl1", name);

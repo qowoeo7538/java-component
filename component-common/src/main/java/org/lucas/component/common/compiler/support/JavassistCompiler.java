@@ -81,7 +81,7 @@ public class JavassistCompiler extends AbstractCompiler {
         ClassLoader classLoader = ClassUtils.getCallerClassLoader(getClass());
         CtClass cls = builder.build(classLoader);
         // 通过类加载器,和权限域创建对象.
-        return cls.toClass(ClassUtils.getCallerClassLoader(getClass()), JavassistCompiler.class.getProtectionDomain());
+        return cls.toClass(classLoader, JavassistCompiler.class.getProtectionDomain());
     }
 }
 
