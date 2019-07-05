@@ -45,7 +45,7 @@ public abstract class StreamUtils {
      * @param encode 编码
      * @return 字节
      */
-    public static byte[] getChartoByte(char chars, String encode) {
+    public static byte[] getCharToByte(char chars, String encode) {
         Charset cs = Charset.forName(encode);
         //分配缓冲区
         CharBuffer cb = CharBuffer.allocate(1);
