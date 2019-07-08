@@ -97,6 +97,18 @@ public class ExtensionLoader<T> {
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
 
     /**
+     * ExtensionLoader<type> 基于 ExtensionLoader<ExtensionFactory> 构建,
+     * 所以会先构建 ExtensionLoader<ExtensionFactory> 对象
+     *
+     * @param type 类类型
+     */
+    private ExtensionLoader(final Class<?> type) {
+        this.type = type;
+        // 创建对象的 SPI 工厂类
+        objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
+    }
+
+    /**
      * 尝试从 {@link #EXTENSION_LOADERS} 获取 {@code ExtensionLoader}，
      * 如果为 {@code null}, 再构造该 Class 的 {@code ExtensionLoader} 放入 {@link #EXTENSION_LOADERS}
      *
@@ -122,38 +134,6 @@ public class ExtensionLoader<T> {
             loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
         }
         return loader;
-    }
-
-    /**
-     * ExtensionLoader<type> 基于 ExtensionLoader<ExtensionFactory> 构建,
-     * 所以会先构建 ExtensionLoader<ExtensionFactory> 对象
-     *
-     * @param type 类类型
-     */
-    private ExtensionLoader(final Class<?> type) {
-        this.type = type;
-        // 创建对象的 SPI 工厂类
-        objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
-    }
-
-    /**
-     * 双重检查
-     * 获取 {@link #cachedClasses}
-     *
-     * @see #loadExtensionClasses()
-     */
-    private Map<String, Class<?>> getExtensionClasses() {
-        Map<String, Class<?>> classes = cachedClasses.get();
-        if (classes == null) {
-            synchronized (cachedClasses) {
-                classes = cachedClasses.get();
-                if (classes == null) {
-                    classes = loadExtensionClasses();
-                    cachedClasses.set(classes);
-                }
-            }
-        }
-        return classes;
     }
 
     /**
@@ -287,6 +267,26 @@ public class ExtensionLoader<T> {
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    /**
+     * 双重检查
+     * 获取 {@link #cachedClasses}
+     *
+     * @see #loadExtensionClasses()
+     */
+    private Map<String, Class<?>> getExtensionClasses() {
+        Map<String, Class<?>> classes = cachedClasses.get();
+        if (classes == null) {
+            synchronized (cachedClasses) {
+                classes = cachedClasses.get();
+                if (classes == null) {
+                    classes = loadExtensionClasses();
+                    cachedClasses.set(classes);
+                }
+            }
+        }
+        return classes;
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.lucas.component.common.extension;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lucas.component.common.extension.ext10_abstract.SimpleExt10;
 import org.lucas.component.common.extension.ext9_empty.Ext9Empty;
@@ -31,6 +32,15 @@ public class ExtensionLoader_Test {
 
         String name = ExtensionLoader.getExtensionLoader(SimpleExt10.class).getDefaultExtensionName();
         assertEquals("impl1", name);
+    }
+
+    @Test
+    public void test_hasExtension() {
+        ExtensionLoader<SimpleExt10> loader = ExtensionLoader.getExtensionLoader(SimpleExt10.class);
+        boolean isExist = loader.hasExtension("impl1");
+        Assertions.assertTrue(isExist);
+        isExist = loader.hasExtension("impl10");
+        Assertions.assertFalse(isExist);
     }
 
 }
