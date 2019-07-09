@@ -330,4 +330,14 @@ public abstract class ClassUtils {
         }
         return cl;
     }
+
+    public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        return (clazz.isPrimitive() || isPrimitiveWrapper(clazz));
+    }
+
+    public static boolean isPrimitiveWrapper(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        return primitiveWrapperTypeMap.containsKey(clazz);
+    }
 }

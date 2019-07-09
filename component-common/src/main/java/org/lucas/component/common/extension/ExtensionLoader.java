@@ -1,8 +1,10 @@
 package org.lucas.component.common.extension;
 
 import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.core.PatternConstants;
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
 import org.lucas.component.common.util.ClassUtils;
+import org.lucas.component.common.util.CollectionUtils;
 import org.lucas.component.common.util.ExceptionUtils;
 import org.lucas.component.common.util.Holder;
 import org.lucas.component.common.util.StringUtils;
@@ -24,10 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class ExtensionLoader<T> {
-
-    private static final String REMOVE_VALUE_PREFIX = "-";
-
-    private static final String DEFAULT_KEY = "default";
 
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
 
@@ -210,16 +208,12 @@ public class ExtensionLoader<T> {
 
     public T getExtension(String name) {
         if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("Extension name == null");
+            throw new IllegalArgumentException(EXTENSION_IS_NULL_EXCEPTION);
         }
         if (Constants.TRUE.equals(name)) {
             return getDefaultExtension();
         }
-        Holder<Object> holder = cachedInstances.get(name);
-        if (holder == null) {
-            cachedInstances.putIfAbsent(name, new Holder<>());
-            holder = cachedInstances.get(name);
-        }
+        final Holder<Object> holder = getOrCreateHolder(name);
         Object instance = holder.get();
         if (instance == null) {
             synchronized (holder) {
@@ -258,15 +252,20 @@ public class ExtensionLoader<T> {
     }
 
     public boolean hasExtension(String name) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("Extension name == null");
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException(EXTENSION_IS_NULL_EXCEPTION);
         }
-        try {
-            this.getExtensionClass(name);
-            return true;
-        } catch (Throwable t) {
-            return false;
+        Class<?> c = this.getExtensionClass(name);
+        return c != null;
+    }
+
+    private Holder<Object> getOrCreateHolder(String name) {
+        Holder<Object> holder = cachedInstances.get(name);
+        if (holder == null) {
+            cachedInstances.putIfAbsent(name, new Holder<>());
+            holder = cachedInstances.get(name);
         }
+        return holder;
     }
 
     /**
@@ -309,7 +308,7 @@ public class ExtensionLoader<T> {
             }
             injectExtension(instance);
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
-            if (wrapperClasses != null && !wrapperClasses.isEmpty()) {
+            if (!CollectionUtils.isEmpty(wrapperClasses)) {
                 for (Class<?> wrapperClass : wrapperClasses) {
                     instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
                 }
@@ -378,13 +377,9 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension type == null");
         }
         if (name == null) {
-            throw new IllegalArgumentException("Extension name == null");
+            throw new IllegalArgumentException(EXTENSION_IS_NULL_EXCEPTION);
         }
-        Class<?> clazz = getExtensionClasses().get(name);
-        if (clazz == null) {
-            throw new IllegalStateException("No such extension \"" + name + "\" for " + type.getName() + "!");
-        }
-        return clazz;
+        return getExtensionClasses().get(name);
     }
 
 
@@ -395,13 +390,23 @@ public class ExtensionLoader<T> {
      * @see #loadDirectory(Map, String, String)
      */
     private Map<String, Class<?>> loadExtensionClasses() {
+        cacheDefaultExtensionName();
+
+        final Map<String, Class<?>> extensionClasses = new HashMap<>(16);
+        loadDirectory(extensionClasses, INTERNAL_DIRECTORY, type.getName());
+        loadDirectory(extensionClasses, DIRECTORY, type.getName());
+        loadDirectory(extensionClasses, SERVICES_DIRECTORY, type.getName());
+        return extensionClasses;
+    }
+
+    private void cacheDefaultExtensionName() {
         // 获取 SPI 接口的注解信息
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if (defaultAnnotation != null) {
             String value = defaultAnnotation.value();
             if ((value = value.trim()).length() > 0) {
                 // 将 SPI 注解信息的 value 按照 "," 进行切割
-                String[] names = Constants.COMMA_SPLIT_PATTERN.split(value);
+                String[] names = PatternConstants.COMMA_SPLIT_PATTERN.split(value);
                 if (names.length > 1) {
                     throw new IllegalStateException("默认扩展名超过最大长度[1] " + type.getName() + ": " + Arrays.toString(names));
                 }
@@ -410,11 +415,6 @@ public class ExtensionLoader<T> {
                 }
             }
         }
-        final Map<String, Class<?>> extensionClasses = new HashMap<>(16);
-        loadDirectory(extensionClasses, INTERNAL_DIRECTORY, type.getName());
-        loadDirectory(extensionClasses, DIRECTORY, type.getName());
-        loadDirectory(extensionClasses, SERVICES_DIRECTORY, type.getName());
-        return extensionClasses;
     }
 
     /**
@@ -507,51 +507,80 @@ public class ExtensionLoader<T> {
         }
         // 判断是否包含 @Adaptive 注解
         if (clazz.isAnnotationPresent(Adaptive.class)) {
-            if (cachedAdaptiveClass == null) {
-                cachedAdaptiveClass = clazz;
-            } else if (!cachedAdaptiveClass.equals(clazz)) {
-                throw new IllegalStateException("More than 1 adaptive class found: "
-                        + cachedAdaptiveClass.getClass().getName()
-                        + ", " + clazz.getClass().getName());
-            }
+            cacheAdaptiveClass(clazz);
             // 判断是否包含 type 类型的构造函数
         } else if (isWrapperClass(clazz)) {
-            Set<Class<?>> wrappers = cachedWrapperClasses;
-            if (wrappers == null) {
-                cachedWrapperClasses = new ConcurrentHashSet<>();
-                wrappers = cachedWrapperClasses;
-            }
-            wrappers.add(clazz);
+            cacheWrapperClass(clazz);
         } else {
-            // 至少需要一个无参构造器
+            // 需要一个无参构造器
             clazz.getConstructor();
-            if (name == null || name.length() == 0) {
+            if (StringUtils.isEmpty(name)) {
                 // 默认类名为别名
-                name = clazz.getSimpleName();
-                if (name.endsWith(type.getSimpleName())) {
-                    name = name.substring(0, name.length() - type.getSimpleName().length());
-                }
-                name = name.toLowerCase();
+                name = findAnnotationName(clazz);
                 if (name.length() == 0) {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
             }
-            final String[] names = Constants.COMMA_SPLIT_PATTERN.split(name);
+            final String[] names = PatternConstants.COMMA_SPLIT_PATTERN.split(name);
             if (names != null && names.length > 0) {
                 for (String n : names) {
-                    if (!cachedNames.containsKey(clazz)) {
-                        // 检查 cachedNames 是否包含该 class, 没有则放入 cachedNames 中.
-                        cachedNames.put(clazz, n);
-                    }
-                    Class<?> c = extensionClasses.get(n);
-                    if (c == null) {
-                        extensionClasses.put(n, clazz);
-                    } else if (c != clazz) {
-                        throw new IllegalStateException("Duplicate extension " + type.getName() + " name " + n + " on " + c.getName() + " and " + clazz.getName());
-                    }
+                    // 缓存名称
+                    cacheName(clazz, n);
+                    saveInExtensionClass(extensionClasses, clazz, name);
                 }
             }
         }
+    }
+
+    private void saveInExtensionClass(Map<String, Class<?>> extensionClasses, Class<?> clazz, String name) {
+        Class<?> c = extensionClasses.get(name);
+        if (c == null) {
+            extensionClasses.put(name, clazz);
+        } else if (c != clazz) {
+            throw new IllegalStateException("Duplicate extension " + type.getName() + " name " + name + " on " + c.getName() + " and " + clazz.getName());
+        }
+    }
+
+    private void cacheName(Class<?> clazz, String name) {
+        if (!cachedNames.containsKey(clazz)) {
+            cachedNames.put(clazz, name);
+        }
+    }
+
+    /**
+     * 获取默认别名
+     *
+     * @param clazz 类类型
+     * @return 默认别名
+     */
+    private String findAnnotationName(Class<?> clazz) {
+        String name = clazz.getSimpleName();
+        if (name.endsWith(type.getSimpleName())) {
+            name = name.substring(0, name.length() - type.getSimpleName().length());
+        }
+        return name.toLowerCase();
+    }
+
+    /**
+     * 缓存适配类
+     *
+     * @param clazz 类类型
+     */
+    private void cacheAdaptiveClass(Class<?> clazz) {
+        if (cachedAdaptiveClass == null) {
+            cachedAdaptiveClass = clazz;
+        } else if (!cachedAdaptiveClass.equals(clazz)) {
+            throw new IllegalStateException("More than 1 adaptive class found: "
+                    + cachedAdaptiveClass.getClass().getName()
+                    + ", " + clazz.getClass().getName());
+        }
+    }
+
+    private void cacheWrapperClass(Class<?> clazz) {
+        if (cachedWrapperClasses == null) {
+            cachedWrapperClasses = new ConcurrentHashSet<>();
+        }
+        cachedWrapperClasses.add(clazz);
     }
 
     /**
@@ -565,22 +594,16 @@ public class ExtensionLoader<T> {
             if (objectFactory != null) {
                 // 遍历 instance 所有的 public 方法
                 for (Method method : instance.getClass().getMethods()) {
-                    /**
-                     * 条件：
-                     * 1) 方法名以 set 开头
-                     * 2) 方法只有一个参数
-                     * 3) 方法的修饰符为 public
-                     */
-                    if (method.getName().startsWith("set")
-                            && method.getParameterTypes().length == 1
-                            && Modifier.isPublic(method.getModifiers())) {
+                    if (isSetter(method)) {
                         if (method.getAnnotation(DisableInject.class) != null) {
                             continue;
                         }
                         Class<?> pt = method.getParameterTypes()[0];
+                        if (ClassUtils.isPrimitiveOrWrapper(pt)) {
+                            continue;
+                        }
                         try {
-                            String property = method.getName().length() > 3 ? method.getName().substring(3, 4).toLowerCase()
-                                    + method.getName().substring(4) : "";
+                            String property = getSetterProperty(method);
                             Object object = objectFactory.getExtension(pt, property);
                             if (object != null) {
                                 method.invoke(instance, object);
@@ -597,6 +620,25 @@ public class ExtensionLoader<T> {
             e.printStackTrace();
         }
         return instance;
+    }
+
+    private String getSetterProperty(Method method) {
+        return method.getName().length() > 3 ? method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4) : "";
+    }
+
+    /**
+     * 条件：
+     * 1) 方法名以 set 开头
+     * 2) 方法只有一个参数
+     * 3) 方法的修饰符为 public
+     *
+     * @param method 方法类型
+     * @return 是否是setter方法。
+     */
+    private boolean isSetter(Method method) {
+        return method.getName().startsWith("set")
+                && method.getParameterTypes().length == 1
+                && Modifier.isPublic(method.getModifiers());
     }
 
     /**
@@ -622,4 +664,6 @@ public class ExtensionLoader<T> {
     private static <T> boolean withExtensionAnnotation(Class<T> type) {
         return type.isAnnotationPresent(SPI.class);
     }
+
+    private static final String EXTENSION_IS_NULL_EXCEPTION = "Extension name == null";
 }
