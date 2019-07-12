@@ -24,7 +24,7 @@ ext {
     moduleProjects = subprojects.findAll {
         !it.name.equals('component-build-script')
     }
-    localRepository = '/home/shaw/.m2/repository/'
+    localRepository = 'D:\\maven\\repository\\'
 }
 
 // 所有项目配置
@@ -86,8 +86,9 @@ configure(moduleProjects) { subproject ->
 
     [compileJava, compileTestJava].each() {
         it.options.encoding = 'UTF-8'
-        it.sourceCompatibility = 11
-        it.targetCompatibility = 11
+        it.options.fork = true
+        // 指定 javac 路径
+        it.options.forkOptions.executable = "C:\\Program Files\\Java\\jdk-11.0.3\\bin\\javac"
     }
 
     compileTestJava {
