@@ -1,5 +1,6 @@
 package org.lucas.component.common.compiler.support;
 
+import org.lucas.component.common.core.constants.ClassConstants;
 import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.ConfigUtils;
 import org.lucas.component.common.util.ResourceUtils;
@@ -86,7 +87,7 @@ public class JdkCompiler extends AbstractCompiler {
          * 2) 不是默认的类加载器
          */
         if (loader instanceof URLClassLoader
-                && (!ClassUtils.APP_CLASSLOADER.equals(loader.getClass().getName()))) {
+                && (!ClassConstants.APP_CLASSLOADER.equals(loader.getClass().getName()))) {
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<>();
@@ -116,7 +117,7 @@ public class JdkCompiler extends AbstractCompiler {
         JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
         // 将文件对象跟java文件管理器绑定
         javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName,
-                className + ClassUtils.JAVA_FILE_SUFFIX, javaFileObject);
+                className + ClassConstants.JAVA_FILE_SUFFIX, javaFileObject);
         // 根据组建创建编译任务,并进行编译
         Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options,
                 null, Arrays.asList(javaFileObject)).call();
@@ -243,7 +244,7 @@ public class JdkCompiler extends AbstractCompiler {
          * @param source   源代码
          */
         public JavaFileObjectImpl(final String baseName, final CharSequence source) {
-            super(ResourceUtils.toURI(baseName + ClassUtils.JAVA_FILE_SUFFIX), Kind.SOURCE);
+            super(ResourceUtils.toURI(baseName + ClassConstants.JAVA_FILE_SUFFIX), Kind.SOURCE);
             this.source = source;
         }
 

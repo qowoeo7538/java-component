@@ -1,6 +1,7 @@
 package org.lucas.component.common.compiler.support;
 
 import org.lucas.component.common.compiler.Compiler;
+import org.lucas.component.common.core.constants.ClassConstants;
 import org.lucas.component.common.util.ExceptionUtils;
 
 import java.util.regex.Matcher;
@@ -23,10 +24,6 @@ public abstract class AbstractCompiler implements Compiler {
      */
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+");
 
-    /**
-     * 代码结束符
-     */
-    private static final String CODE_ENDS_WITH = "}";
 
     /**
      * 根据源代码和类加载器加载类
@@ -60,7 +57,7 @@ public abstract class AbstractCompiler implements Compiler {
             // 尝试加载 class 文件到内存
             return Class.forName(className, true, getClass().getClassLoader());
         } catch (final ClassNotFoundException e) {
-            if (!code.endsWith(CODE_ENDS_WITH)) {
+            if (!code.endsWith(ClassConstants.CODE_ENDS_WITH)) {
                 throw new IllegalStateException("java code 应该以 \"}\" 结尾, code: \n" + code + "\n");
             }
             try {

@@ -1,5 +1,6 @@
 package org.lucas.component.common.util;
 
+import org.lucas.component.common.core.constants.ClassConstants;
 import org.springframework.util.Assert;
 
 import java.io.Closeable;
@@ -25,37 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ClassUtils {
 
     /**
-     * 数组后缀
-     */
-    public static final String ARRAY_SUFFIX = "[]";
-
-    /**
-     * 非原始数据数组前缀{@code "[L"}.
-     */
-    public static final String NON_PRIMITIVE_ARRAY_PREFIX = "[L";
-
-
-    public static final String INTERNAL_ARRAY_PREFIX = "[";
-
-    /**
      * 继承分隔符： {@code '$'}.
      */
     private static final char INNER_CLASS_SEPARATOR = '$';
-
-    /**
-     * package 分隔字符: "."
-     */
-    public static final String PACKAGE_SEPARATOR = ".";
-
-    /**
-     * java文件后缀
-     */
-    public static final String JAVA_FILE_SUFFIX = ".java";
-
-    /**
-     * 默认类加载器类名
-     */
-    public static final String APP_CLASSLOADER = "sun.misc.Launcher$AppClassLoader";
 
     // =====================================
 
@@ -189,7 +162,7 @@ public abstract class ClassUtils {
                 // 匹配所有的导入包,尝试加载
                 for (String pkg : packages) {
                     try {
-                        return ClassUtils.forName(pkg + PACKAGE_SEPARATOR + className, classLoader);
+                        return ClassUtils.forName(pkg + ClassConstants.PACKAGE_SEPARATOR + className, classLoader);
                     } catch (ClassNotFoundException e2) {
                     }
                 }
@@ -213,24 +186,24 @@ public abstract class ClassUtils {
         }
 
         // 例如："java.lang.String[]"
-        if (name.endsWith(ARRAY_SUFFIX)) {
+        if (name.endsWith(ClassConstants.ARRAY_SUFFIX)) {
             // 获取数组的类型
-            String elementClassName = name.substring(0, name.length() - ARRAY_SUFFIX.length());
+            String elementClassName = name.substring(0, name.length() - ClassConstants.ARRAY_SUFFIX.length());
             Class<?> elementClass = forName(elementClassName, classLoader);
             // 实例化数组类类型
             return Array.newInstance(elementClass, 0).getClass();
         }
 
         // 非原始数据类型数组"[Ljava.lang.String;"
-        if (name.startsWith(NON_PRIMITIVE_ARRAY_PREFIX) && name.endsWith(";")) {
-            String elementName = name.substring(NON_PRIMITIVE_ARRAY_PREFIX.length(), name.length() - 1);
+        if (name.startsWith(ClassConstants.NON_PRIMITIVE_ARRAY_PREFIX) && name.endsWith(";")) {
+            String elementName = name.substring(ClassConstants.NON_PRIMITIVE_ARRAY_PREFIX.length(), name.length() - 1);
             Class<?> elementClass = forName(elementName, classLoader);
             return Array.newInstance(elementClass, 0).getClass();
         }
 
         // "[[I" or "[[Ljava.lang.String;"
-        if (name.startsWith(INTERNAL_ARRAY_PREFIX)) {
-            String elementName = name.substring(INTERNAL_ARRAY_PREFIX.length());
+        if (name.startsWith(ClassConstants.INTERNAL_ARRAY_PREFIX)) {
+            String elementName = name.substring(ClassConstants.INTERNAL_ARRAY_PREFIX.length());
             Class<?> elementClass = forName(elementName, classLoader);
             return Array.newInstance(elementClass, 0).getClass();
         }
@@ -242,7 +215,7 @@ public abstract class ClassUtils {
         try {
             return Class.forName(name, false, clToUse);
         } catch (ClassNotFoundException ex) {
-            int lastDotIndex = name.lastIndexOf(PACKAGE_SEPARATOR);
+            int lastDotIndex = name.lastIndexOf(ClassConstants.PACKAGE_SEPARATOR);
             if (lastDotIndex != -1) {
                 String innerClassName =
                         name.substring(0, lastDotIndex) + INNER_CLASS_SEPARATOR + name.substring(lastDotIndex + 1);
