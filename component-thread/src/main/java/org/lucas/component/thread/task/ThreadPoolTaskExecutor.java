@@ -2,7 +2,7 @@ package org.lucas.component.thread.task;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.core.constants.SystemConstants;
 import org.lucas.component.thread.task.support.AbortPolicyWithReport;
 import org.lucas.component.thread.task.support.AfterFunction;
 import org.lucas.component.thread.task.support.BeforeFunction;
@@ -59,7 +59,7 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
      *
      * @see org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor#corePoolSize
      */
-    private static final int DEFAULT_CORE_POOL_SIZE = Constants.CORE_SIZE + 1;
+    private static final int DEFAULT_CORE_POOL_SIZE = SystemConstants.CORE_SIZE + 1;
 
     /**
      * 最大线程池大小
@@ -71,7 +71,7 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
      *
      * @see org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor#maxPoolSize
      */
-    private static final int DEFAULT_MAX_POOL_SIZE = 2 * Constants.CORE_SIZE + 1;
+    private static final int DEFAULT_MAX_POOL_SIZE = 2 * SystemConstants.CORE_SIZE + 1;
 
     /**
      * 线程池中超过核心线程数目的空闲线程最大存活时间；

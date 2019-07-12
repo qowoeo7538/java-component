@@ -19,7 +19,8 @@ module component.common {
 
     // ================================================
 
-    exports org.lucas.component.common.core;
+    exports org.lucas.component.common.core.constants;
+    exports org.lucas.component.common.core.pattern;
     exports org.lucas.component.common.compiler;
     exports org.lucas.component.common.extension to ExtensionLoader;
     exports org.lucas.component.common.io;

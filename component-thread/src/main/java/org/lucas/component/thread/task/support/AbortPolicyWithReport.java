@@ -2,7 +2,7 @@ package org.lucas.component.thread.task.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lucas.component.common.core.Constants;
+import org.lucas.component.common.core.constants.SystemConstants;
 import org.lucas.component.common.util.ThreadInfoUtils;
 import org.springframework.util.StreamUtils;
 
@@ -81,7 +81,7 @@ public class AbortPolicyWithReport implements RejectedExecutionHandler {
             String os = System.getProperty("os.name").toLowerCase();
 
             // window 系统的文件不支持 ":"
-            if (os.contains(Constants.WINDOWS_SYS_PREFIX)) {
+            if (os.contains(SystemConstants.WINDOWS_SYS_PREFIX)) {
                 sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             } else {
                 sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

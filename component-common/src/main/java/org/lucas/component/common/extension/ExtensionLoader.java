@@ -1,8 +1,8 @@
 package org.lucas.component.common.extension;
 
-import org.lucas.component.common.core.Constants;
-import org.lucas.component.common.core.PatternConstants;
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
+import org.lucas.component.common.core.constants.CommonConstants;
+import org.lucas.component.common.core.pattern.SplitPattern;
 import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.CollectionUtils;
 import org.lucas.component.common.util.ExceptionUtils;
@@ -210,7 +210,7 @@ public class ExtensionLoader<T> {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException(EXTENSION_IS_NULL_EXCEPTION);
         }
-        if (Constants.TRUE.equals(name)) {
+        if (CommonConstants.TRUE.equals(name)) {
             return getDefaultExtension();
         }
         final Holder<Object> holder = getOrCreateHolder(name);
@@ -232,7 +232,7 @@ public class ExtensionLoader<T> {
      */
     public T getDefaultExtension() {
         getExtensionClasses();
-        if (null == cachedDefaultName || cachedDefaultName.length() == 0 || Constants.TRUE.equals(cachedDefaultName)) {
+        if (null == cachedDefaultName || cachedDefaultName.length() == 0 || CommonConstants.TRUE.equals(cachedDefaultName)) {
             return null;
         }
         return getExtension(cachedDefaultName);
@@ -406,7 +406,7 @@ public class ExtensionLoader<T> {
             String value = defaultAnnotation.value();
             if ((value = value.trim()).length() > 0) {
                 // 将 SPI 注解信息的 value 按照 "," 进行切割
-                String[] names = PatternConstants.COMMA_SPLIT_PATTERN.split(value);
+                String[] names = SplitPattern.COMMA_SPLIT_PATTERN.split(value);
                 if (names.length > 1) {
                     throw new IllegalStateException("默认扩展名超过最大长度[1] " + type.getName() + ": " + Arrays.toString(names));
                 }
@@ -521,7 +521,7 @@ public class ExtensionLoader<T> {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
             }
-            final String[] names = PatternConstants.COMMA_SPLIT_PATTERN.split(name);
+            final String[] names = SplitPattern.COMMA_SPLIT_PATTERN.split(name);
             if (names != null && names.length > 0) {
                 for (String n : names) {
                     // 缓存名称
