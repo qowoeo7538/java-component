@@ -112,22 +112,6 @@ public abstract class ClassUtils {
         registerCommonClasses(javaLanguageInterfaceArray);
     }
 
-    public static String getTypeStr(Class clazz) {
-        String str = TYPE_STR_CACHE.get(clazz);
-        if (StringUtils.isEmpty(str)) {
-
-        }
-        return "";
-    }
-
-    public static String[] getTypeStrs(Class... types) {
-        return null;
-    }
-
-    public static String[] getTypeStrs(Class[] types, boolean javaStyle) {
-        return null;
-    }
-
     /**
      * @param caller class 对象
      * @return 返回该 class 对象的类加载器
