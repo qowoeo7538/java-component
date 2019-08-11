@@ -24,7 +24,7 @@ ext {
     moduleProjects = subprojects.findAll {
         !it.name.equals('component-build-script')
     }
-    localRepository = '/home/shaw/.m2/repository'
+    localRepository = '/home/shaw/.m2/repository/'
 }
 
 // 所有项目配置
@@ -56,7 +56,7 @@ configure(moduleProjects) { subproject ->
         repository(url: uri(localRepository))
         // 组名
         pom.groupId = 'org.lucas'
-        // 版本号
+        // 版本号,需要与配置版本号一致
         pom.version = '1.0-SNAPSHOT'
     }
 
