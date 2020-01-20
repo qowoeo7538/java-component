@@ -33,7 +33,8 @@ public class ShardingTBAlgorithm {
      */
     public static String getLocatorStr(String identity) {
         String locatorStr = Integer.toString(ShardingTBAlgorithm.getRealNode(identity), 32).toUpperCase();
-        if (locatorStr.length() == 1) {//不足两位 补0
+        //不足两位 补0
+        if (locatorStr.length() == 1) {
             locatorStr = "0" + locatorStr;
         }
         return locatorStr;
