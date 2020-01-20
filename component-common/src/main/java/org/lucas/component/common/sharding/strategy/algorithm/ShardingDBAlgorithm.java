@@ -3,16 +3,16 @@ package org.lucas.component.common.sharding.strategy.algorithm;
 import org.lucas.component.common.hash.ShardingHashCode;
 import org.lucas.component.common.util.StringUtils;
 
-public class ShardingDbAlgorithm {
+public class ShardingDBAlgorithm {
 
     private static ShardingHashCode dataBaseHashCoding;
 
     public static ShardingHashCode getDataBaseHashCoding() {
-        return ShardingDbAlgorithm.dataBaseHashCoding;
+        return ShardingDBAlgorithm.dataBaseHashCoding;
     }
 
     public static void setDataBaseHashCoding(ShardingHashCode dataBaseHashCoding) {
-        ShardingDbAlgorithm.dataBaseHashCoding = dataBaseHashCoding;
+        ShardingDBAlgorithm.dataBaseHashCoding = dataBaseHashCoding;
     }
 
     /**
@@ -33,7 +33,7 @@ public class ShardingDbAlgorithm {
      * @return
      */
     public static String getLocatorStr(String identity) {
-        String locatorStr = Integer.toString(ShardingDbAlgorithm.getRealNode(identity), 32).toUpperCase();
+        String locatorStr = Integer.toString(ShardingDBAlgorithm.getRealNode(identity), 32).toUpperCase();
         //不足两位 补0
         if (locatorStr.length() == 1) {
             locatorStr = "0" + locatorStr;
