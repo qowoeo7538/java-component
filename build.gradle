@@ -64,19 +64,20 @@ configure(moduleProjects) { subproject ->
     ext {
         artifactId = uploadArchives.repositories.mavenDeployer.pom.artifactId
 
-        disruptorVersion = "3.4.2"
-        logbackVersion = "1.2.3"
+        disruptor_version = "3.4.2"
+        logback_version = "1.2.3"
         unit_jupiter_version = "5.5.0"
-        mockitoVersion = "2.12.0"
-        hamcrestVersion = "1.3"
-        springVersion = "5.1.6.RELEASE"
+        mockito_version = "2.12.0"
+        hamcrest_version = "1.3"
+        spring_version = "5.1.6.RELEASE"
         javassist_version = "3.25.0-GA"
-        collectionsVersion = "9.2.0"
+        collections_version = "9.2.0"
+        google_guava_version = "28.2-jre"
     }
 
     dependencyManagement {
         imports {
-            mavenBom "org.springframework:spring-framework-bom:${springVersion}"
+            mavenBom "org.springframework:spring-framework-bom:${spring_version}"
         }
         resolutionStrategy {
             cacheChangingModulesFor 0, 'seconds'
@@ -96,15 +97,15 @@ configure(moduleProjects) { subproject ->
     }
 
     dependencies {
-        compile("org.eclipse.collections:eclipse-collections-api:${collectionsVersion}")
-        compile("org.eclipse.collections:eclipse-collections:${collectionsVersion}")
+        compile("org.eclipse.collections:eclipse-collections-api:${collections_version}")
+        compile("org.eclipse.collections:eclipse-collections:${collections_version}")
         testCompile("org.junit.jupiter:junit-jupiter-api:${unit_jupiter_version}") {
             exclude group: 'org.hamcrest', module: 'hamcrest-core'
         }
-        testCompile("org.mockito:mockito-core:${mockitoVersion}") {
+        testCompile("org.mockito:mockito-core:${mockito_version}") {
             exclude group: 'org.hamcrest', module: 'hamcrest-core'
         }
-        testCompile("org.hamcrest:hamcrest-all:${hamcrestVersion}")
+        testCompile("org.hamcrest:hamcrest-all:${hamcrest_version}")
     }
 
     project.pmd {

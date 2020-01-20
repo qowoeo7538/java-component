@@ -6,5 +6,5 @@ dependencies {
     compile(project(":component-common"))
     compile("org.springframework:spring-core")
     compile("org.springframework:spring-context")
-    compile("com.lmax:disruptor:${disruptorVersion}")
+    compile("com.lmax:disruptor:${disruptor_version}")
 }
