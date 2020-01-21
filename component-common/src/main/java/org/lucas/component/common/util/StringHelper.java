@@ -5,7 +5,7 @@ package org.lucas.component.common.util;
  * @create: 2018-06-01
  * @description:
  */
-public abstract class StringUtils extends org.springframework.util.StringUtils {
+public abstract class StringHelper {
 
     /**
      * @param camelName 字符串

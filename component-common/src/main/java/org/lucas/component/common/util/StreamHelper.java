@@ -18,7 +18,7 @@ import java.util.Base64;
 /**
  * io工具类
  */
-public abstract class StreamUtils {
+public abstract class StreamHelper {
 
     /**
      * 通道处理工具类

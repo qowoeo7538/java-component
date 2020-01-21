@@ -1,7 +1,7 @@
 package org.lucas.component.common.io.support;
 
-import org.lucas.component.common.util.StreamUtils;
 import org.lucas.component.common.util.ExceptionUtils;
+import org.lucas.component.common.util.StreamHelper;
 
 import java.io.RandomAccessFile;
 
@@ -30,7 +30,7 @@ public class SegmentCopyFile {
     public SegmentCopyFile(String srcName, String copyName, int count) {
         this.srcName = srcName;
         try {
-            this.fileSize = StreamUtils.getFileSize(SegmentCopyFile.this.srcName);
+            this.fileSize = StreamHelper.getFileSize(SegmentCopyFile.this.srcName);
         } catch (Exception e) {
             throw ExceptionUtils.unchecked(e);
         }

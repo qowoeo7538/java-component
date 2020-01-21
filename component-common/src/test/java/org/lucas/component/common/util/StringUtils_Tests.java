@@ -6,7 +6,7 @@ public class StringUtils_Tests {
 
     @Test
     public void testCamelToSplitName() {
-        System.out.println(StringUtils.camelToSplitName("ExtensionLoader", "."));
+        System.out.println(StringHelper.camelToSplitName("ExtensionLoader", "."));
     }
 
 }

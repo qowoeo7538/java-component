@@ -7,7 +7,7 @@ import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.CollectionUtils;
 import org.lucas.component.common.util.ExceptionUtils;
 import org.lucas.component.common.util.Holder;
-import org.lucas.component.common.util.StringUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
