@@ -1,17 +1,18 @@
-package org.lucas.component.common.sharding.strategy.algorithm;
+package org.lucas.component.common.strategy.algorithm;
 
 import org.lucas.component.common.hash.ShardingHashCode;
 import org.lucas.component.common.util.StringUtils;
 
-public class ShardingTBAlgorithm {
-    private static ShardingHashCode tableHashCoding;
+public class ShardingDBAlgorithm {
 
-    public static ShardingHashCode getTableHashCoding() {
-        return tableHashCoding;
+    private static ShardingHashCode dataBaseHashCoding;
+
+    public static ShardingHashCode getDataBaseHashCoding() {
+        return ShardingDBAlgorithm.dataBaseHashCoding;
     }
 
-    public static void setTableHashCoding(ShardingHashCode tableHashCoding) {
-        ShardingTBAlgorithm.tableHashCoding = tableHashCoding;
+    public static void setDataBaseHashCoding(ShardingHashCode dataBaseHashCoding) {
+        ShardingDBAlgorithm.dataBaseHashCoding = dataBaseHashCoding;
     }
 
     /**
@@ -22,7 +23,7 @@ public class ShardingTBAlgorithm {
      */
     public static Integer getRealNode(Object identity) {
         String s = String.valueOf(identity);
-        return tableHashCoding.hashFor(s);
+        return dataBaseHashCoding.hashFor(s);
     }
 
     /**
@@ -32,7 +33,7 @@ public class ShardingTBAlgorithm {
      * @return
      */
     public static String getLocatorStr(String identity) {
-        String locatorStr = Integer.toString(ShardingTBAlgorithm.getRealNode(identity), 32).toUpperCase();
+        String locatorStr = Integer.toString(ShardingDBAlgorithm.getRealNode(identity), 32).toUpperCase();
         //不足两位 补0
         if (locatorStr.length() == 1) {
             locatorStr = "0" + locatorStr;
