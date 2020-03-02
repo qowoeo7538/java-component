@@ -35,7 +35,7 @@ public abstract class NetUtils {
     }
 
     /**
-     * 获取Ip地址
+     * 获取Ip地址 xxx.xxx.xxx.xxx
      *
      * @return
      */

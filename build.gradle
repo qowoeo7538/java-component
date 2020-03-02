@@ -73,6 +73,7 @@ configure(moduleProjects) { subproject ->
         javassist_version = "3.25.0-GA"
         collections_version = "9.2.0"
         google_guava_version = "28.2-jre"
+        joda_time_version = "2.10.5"
     }
 
     dependencyManagement {
