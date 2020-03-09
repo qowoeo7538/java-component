@@ -44,7 +44,7 @@ public class IdCodeGenerator {
 
     private volatile long lastTimestamp = timeGen();
 
-    private static int ip = 0;
+    private static int ip;
 
     static {
         try {

@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GenUUID {
-    static String DASH = "-";
+    private static String DASH = "-";
 
     public static String get32UUID() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
