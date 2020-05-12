@@ -1,4 +1,4 @@
-package org.lucas.component.common;
+package org.lucas.component.common.util;
 
 import org.junit.jupiter.api.Test;
 import org.lucas.component.common.hash.ShardingHashCode;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
-public class ShardingHashCodeTests {
+public class ShardingHashCode_Tests {
 
     @Test
     public void testHashFor() {

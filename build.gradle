@@ -64,6 +64,7 @@ configure(moduleProjects) { subproject ->
     ext {
         artifactId = uploadArchives.repositories.mavenDeployer.pom.artifactId
 
+        snappy_java_version = '1.1.7.5'
         disruptor_version = "3.4.2"
         logback_version = "1.2.3"
         unit_jupiter_version = "5.5.0"

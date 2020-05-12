@@ -11,4 +11,6 @@ dependencies {
     compile("ch.qos.logback:logback-classic:${logback_version}")
     compile("com.google.guava:guava:${google_guava_version}")
     compile("joda-time:joda-time:${joda_time_version}")
+    compile ("org.xerial.snappy:snappy-java:${snappy_java_version}")
+
 }
