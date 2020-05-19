@@ -1,4 +1,4 @@
-package org.lucas.component.common.idcenter;
+package org.lucas.component.common.generator.idcenter;
 
 import org.lucas.component.common.util.DateUtils;
 import org.lucas.component.common.util.NetUtils;

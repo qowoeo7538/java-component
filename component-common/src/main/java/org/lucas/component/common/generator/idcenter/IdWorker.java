@@ -1,4 +1,4 @@
-package org.lucas.component.common.idcenter;
+package org.lucas.component.common.generator.idcenter;
 
 public class IdWorker {
 
