@@ -79,7 +79,7 @@ public class IdUtilTests {
      * 是 UUID version1 的变种，详细介绍可见：服务化框架－分布式 Unique ID 的生成方法一览。
      */
     @Test
-    public void objectId() {
+    public void testObjectId() {
         IntStream.range(1, 10).forEach(i -> System.out.println(ObjectId.next()));
     }
 
