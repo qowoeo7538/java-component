@@ -2,7 +2,7 @@ package org.lucas.component.common.extension;
 
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
 import org.lucas.component.common.core.constants.CommonConstants;
-import org.lucas.component.common.core.pattern.SplitPattern;
+import org.lucas.component.common.core.lang.SplitPatternPool;
 import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.CollectionUtils;
 import org.lucas.component.common.util.ExceptionUtils;
@@ -406,7 +406,7 @@ public class ExtensionLoader<T> {
             String value = defaultAnnotation.value();
             if ((value = value.trim()).length() > 0) {
                 // 将 SPI 注解信息的 value 按照 "," 进行切割
-                String[] names = SplitPattern.COMMA_SPLIT_PATTERN.split(value);
+                String[] names = SplitPatternPool.COMMA_SPLIT_PATTERN.split(value);
                 if (names.length > 1) {
                     throw new IllegalStateException("默认扩展名超过最大长度[1] " + type.getName() + ": " + Arrays.toString(names));
                 }
@@ -521,7 +521,7 @@ public class ExtensionLoader<T> {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
             }
-            final String[] names = SplitPattern.COMMA_SPLIT_PATTERN.split(name);
+            final String[] names = SplitPatternPool.COMMA_SPLIT_PATTERN.split(name);
             if (names != null && names.length > 0) {
                 for (String n : names) {
                     // 缓存名称

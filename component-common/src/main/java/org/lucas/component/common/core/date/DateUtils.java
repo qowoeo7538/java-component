@@ -1,5 +1,6 @@
-package org.lucas.component.common.util;
+package org.lucas.component.common.core.date;
 
+import cn.hutool.core.date.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.util.StringUtils;
@@ -24,22 +25,7 @@ import java.util.regex.Pattern;
 
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 
-public class DateUtils {
-
-    public static final String HMS = "HHmmss";
-    public static final String YM = "yyyyMM";
-    public static final String YMD = "yyyyMMdd";
-    public static final String YMDHM = "yyyyMMddHHmm";
-    public static final String YMDHMS = "yyyyMMddHHmmss";
-    public static final String YYMMDDHHMM = "yyMMddHHmm";
-    public static final String YYMMDDHHMMSS = "yyMMddHHmmss";
-    public static final String YYMMDDHHMMSSSSS = "yyMMddHHmmssSSS";
-
-    public static final String H_M = "HH:mm";
-    public static final String H_M_S = "HH:mm:ss";
-    public static final String Y_M_D = "yyyy-MM-dd";
-    public static final String Y_M_D_HM = "yyyy-MM-dd HH:mm";
-    public static final String Y_M_D_HMS = "yyyy-MM-dd HH:mm:ss";
+public class DateUtils extends DateUtil {
 
     static final Pattern pattern = Pattern.compile("^\\d{4}-\\d{1,2}-\\d{1,2}$");
 
@@ -147,7 +133,7 @@ public class DateUtils {
     public static String formatDate(long milliseconds, String pattern) {
         if (milliseconds > 0) {
             if (StringUtils.isEmpty(pattern)) {
-                pattern = Y_M_D;
+                pattern = DatePattern.Y_M_D;
             }
             final org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern);
             return formatter.print(new DateTime(milliseconds));

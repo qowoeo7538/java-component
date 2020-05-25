@@ -75,6 +75,7 @@ configure(moduleProjects) { subproject ->
         collections_version = "9.2.0"
         google_guava_version = "28.2-jre"
         joda_time_version = "2.10.5"
+        cn_hutool_version = "5.3.5"
     }
 
     dependencyManagement {

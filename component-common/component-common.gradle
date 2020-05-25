@@ -12,5 +12,5 @@ dependencies {
     compile("com.google.guava:guava:${google_guava_version}")
     compile("joda-time:joda-time:${joda_time_version}")
     compile ("org.xerial.snappy:snappy-java:${snappy_java_version}")
-
+    compile("cn.hutool:hutool-core:${cn_hutool_version}")
 }
