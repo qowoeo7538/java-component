@@ -1,23 +1,5 @@
-buildscript {
-    repositories {
-        maven { url "https://repo.spring.io/plugins-release" }
-    }
-    dependencies {
-        classpath("io.spring.gradle:propdeps-plugin:0.0.8")
-    }
-}
-
 plugins {
-    id "com.gradle.build-scan" version "2.2.1"
-    id "io.spring.dependency-management" version "1.0.4.RELEASE" apply false
-}
-
-// 审视扫描
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-
-    publishAlways()
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE' apply false
 }
 
 ext {
@@ -29,12 +11,42 @@ ext {
 
 // 所有项目配置
 configure(allprojects) { project ->
-
-    apply plugin: "propdeps"
+    apply plugin: "io.spring.dependency-management"
     apply plugin: "java"
 
     group = "org.lucas"
     version = '1.0-SNAPSHOT'
+
+    ext {
+        spring_version = "5.1.6.RELEASE"
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework:spring-framework-bom:${spring_version}"
+        }
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds'
+        }
+        applyMavenExclusions = false
+
+        generatedPomCustomization {
+            enabled = false
+        }
+
+        repositories {
+            mavenCentral()
+            maven { url "https://repo.spring.io/libs-spring-framework-build" }
+            maven { url "https://repo.spring.io/snapshot" } // Reactor
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 0, "seconds"
+            cacheDynamicVersionsFor 0, "seconds"
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -46,9 +58,8 @@ configure(allprojects) { project ->
 configure(moduleProjects) { subproject ->
 
     apply plugin: "pmd"
-    apply plugin: "findbugs"
     apply plugin: 'maven'
-    apply plugin: 'jdepend'
+    apply plugin: "checkstyle"
     apply plugin: "io.spring.dependency-management"
 
     // 定义本地maven仓库的地址, 执行:gradle clean uploadArchives 发布到本地仓库
@@ -70,7 +81,6 @@ configure(moduleProjects) { subproject ->
         unit_jupiter_version = "5.5.0"
         mockito_version = "2.12.0"
         hamcrest_version = "1.3"
-        spring_version = "5.1.6.RELEASE"
         javassist_version = "3.25.0-GA"
         collections_version = "9.2.0"
         google_guava_version = "28.2-jre"
@@ -78,25 +88,20 @@ configure(moduleProjects) { subproject ->
         cn_hutool_version = "5.3.5"
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework:spring-framework-bom:${spring_version}"
-        }
-        resolutionStrategy {
-            cacheChangingModulesFor 0, 'seconds'
-        }
-        applyMavenExclusions = false
-    }
-
     [compileJava, compileTestJava].each() {
         it.options.encoding = 'UTF-8'
         it.options.fork = true
         // 指定 javac 路径
-        it.options.forkOptions.executable = "/usr/local/sbin/jdk/jdk-11.0.2/bin/javac"
+        // it.options.forkOptions.executable = "/usr/local/sbin/jdk/jdk-11.0.2/bin/javac"
     }
 
     compileTestJava {
         options.compilerArgs += "-parameters"
+    }
+
+    checkstyle {
+        toolVersion = "8.33"
+        configDirectory.set(rootProject.file("src/checkstyle"))
     }
 
     dependencies {
@@ -147,29 +152,6 @@ configure(moduleProjects) { subproject ->
         source = fileTree(dir: "src/main", include: "**/*.java")
         ignoreFailures = true
         reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    project.findbugs {
-        ignoreFailures = false
-        excludeFilter = new File("${project.rootDir}/buildScript/findbugs-filter.xml")
-        reportsDir = file("${project.rootDir}/buildScript/reports")
-        effort = "max"
-    }
-
-    findbugsMain {
-        it.source = fileTree(dir: "src/main", include: "**/*.java")
-        it.reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    findbugsTest {
-        it.source = fileTree(dir: "src/test", include: "**/*.java")
-        it.reports {
             xml.enabled = false
             html.enabled = true
         }
