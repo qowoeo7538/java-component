@@ -1,6 +1,6 @@
 package org.lucas.component.common.core.constants;
 
-public class ClassConstants {
+public abstract class ClassConstants {
 
     /**
      * 接口

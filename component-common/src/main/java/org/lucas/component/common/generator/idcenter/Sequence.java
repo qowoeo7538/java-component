@@ -57,7 +57,7 @@ public class Sequence {
             String ipStr = NetUtils.getLocalIp().substring(NetUtils.getLocalIp().length() - 3, NetUtils.getLocalIp().length());
             ip = Integer.parseInt(ipStr);
         } catch (final SocketException | UnknownHostException e) {
-            throw new IllegalCallerException("");
+            throw new IllegalArgumentException("");
         }
     }
 
