@@ -162,12 +162,6 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
         this.threadPoolExecutor.execute(new ConcurrencyThrottlingRunnable(task));
     }
 
-    @Override
-    public <T> Future<T> submit(final Callable<T> task) {
-        this.throttleSupport.beforeAccess(task);
-        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
-    }
-
     /**
      * @param task         任务
      * @param defaultValue 默认返回值
@@ -177,19 +171,7 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
         if (this.throttleSupport.isLimit()) {
             return new DefaultFuture<>(defaultValue);
         }
-        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingCallable<>(task));
-    }
-
-    @Override
-    public Future<?> submit(final Runnable task) {
-        this.throttleSupport.beforeAccess(task);
-        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task));
-    }
-
-    @Override
-    public <T> Future<T> submit(final Runnable task, final T result) {
-        this.throttleSupport.beforeAccess(task);
-        return this.threadPoolExecutor.submit(new ConcurrencyThrottlingRunnable(task), result);
+        return this.threadPoolExecutor.submit(task);
     }
 
     public ListenableFuture<?> submitListenable(final Runnable task) {
