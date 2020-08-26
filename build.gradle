@@ -68,7 +68,7 @@ configure(moduleProjects) { subproject ->
         // 组名
         pom.groupId = 'org.lucas'
         // 版本号,需要与配置版本号一致
-        pom.version = '1.0-SNAPSHOT'
+        pom.version = '1.0'
     }
 
     // 属性配置
@@ -85,7 +85,7 @@ configure(moduleProjects) { subproject ->
         collections_version = "9.2.0"
         google_guava_version = "28.2-jre"
         joda_time_version = "2.10.5"
-        cn_hutool_version = "5.3.5"
+        cn_hutool_version = "5.4.0"
     }
 
     [compileJava, compileTestJava].each() {
