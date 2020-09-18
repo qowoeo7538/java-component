@@ -21,9 +21,7 @@ import java.net.UnknownHostException;
  * idCodeGenerator.nextId();
  * idCodeGenerator.nextId();
  */
-public class Sequence {
-
-    private static final String DATA_FORMAT = "yyMMddHHmmss";
+public class UidGenerator {
 
     /**
      * ip（三位IP）
@@ -34,17 +32,22 @@ public class Sequence {
      */
     private final String businessCode;
 
-    private volatile long sequence = 0L;
+    /**
+     * 自增序列
+     */
+    private long sequence = 0L;
 
     /**
      * 最后三位ip（最大为255）
      */
     private final long workerIdBits = 8L;
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    private final long maxWorkerId = ~(-1L << workerIdBits);
     private final long sequenceBits = 11L;
 
     private long workerIdShift = sequenceBits;
-    private long sequenceMask = -1L ^ (-1L << sequenceBits);
+
+
+    private final long sequenceMask = ~(-1L << sequenceBits);
 
     private final boolean useSystemClock;
 
@@ -64,21 +67,21 @@ public class Sequence {
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public Sequence(String businessCode) {
+    public UidGenerator(String businessCode) {
         this(ip, businessCode, false);
     }
 
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public Sequence(long workerId, String businessCode) {
+    public UidGenerator(long workerId, String businessCode) {
         this(workerId, businessCode, false);
     }
 
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public Sequence(long workerId, String businessCode, boolean useSystemClock) {
+    public UidGenerator(long workerId, String businessCode, boolean useSystemClock) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
