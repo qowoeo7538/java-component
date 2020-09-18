@@ -7,7 +7,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.junit.jupiter.api.Test;
-import org.lucas.component.common.core.idcenter.UidGenerator;
+import org.lucas.component.common.core.idcenter.CodeGenerator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +42,7 @@ public class IdUtilTests {
 
     @Test
     public void testUidGenerator() {
-        UidGenerator sequence = new UidGenerator(255, "1");
+        CodeGenerator sequence = new CodeGenerator(255, "1");
         IntStream.range(1, 10).forEach(t -> System.out.println(sequence.nextId()));
     }
 
