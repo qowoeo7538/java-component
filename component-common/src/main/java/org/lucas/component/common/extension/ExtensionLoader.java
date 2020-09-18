@@ -2,7 +2,7 @@ package org.lucas.component.common.extension;
 
 import org.lucas.component.common.core.collect.ConcurrentHashSet;
 import org.lucas.component.common.core.constants.CommonConstants;
-import org.lucas.component.common.core.lang.SplitPatternPool;
+import org.lucas.component.common.lang.SplitPatternPool;
 import org.lucas.component.common.util.ClassUtils;
 import org.lucas.component.common.util.CollectionUtils;
 import org.lucas.component.common.util.ExceptionUtils;

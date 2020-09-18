@@ -7,7 +7,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.junit.jupiter.api.Test;
-import org.lucas.component.common.generator.idcenter.Sequence;
+import org.lucas.component.common.core.idcenter.Sequence;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

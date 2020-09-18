@@ -1,4 +1,4 @@
-package org.lucas.component.common.core.lang;
+package org.lucas.component.common.lang;
 
 import cn.hutool.core.lang.SimpleCache;
 

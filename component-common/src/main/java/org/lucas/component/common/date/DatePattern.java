@@ -1,4 +1,4 @@
-package org.lucas.component.common.core.date;
+package org.lucas.component.common.date;
 
 public class DatePattern extends cn.hutool.core.date.DatePattern  {
 

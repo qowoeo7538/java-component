@@ -1,10 +1,9 @@
-package org.lucas.component.common.generator.idcenter;
+package org.lucas.component.common.core.idcenter;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.SystemClock;
 import cn.hutool.core.util.StrUtil;
-import org.lucas.component.common.core.date.DatePattern;
-import org.lucas.component.common.core.date.DateUtils;
+import org.lucas.component.common.date.DatePattern;
+import org.lucas.component.common.date.DateUtils;
 import org.lucas.component.common.util.NetUtils;
 import org.springframework.util.StringUtils;
 
@@ -16,6 +15,7 @@ import java.net.UnknownHostException;
  * <p>
  * 注：如果有多个IP的后三位都一样，有可能会产生一样记录
  * <p>
+ * 参考：https://github.com/baidu/uid-generator
  * 用法：建议只生成一次当前实例
  * IdCodeGenerator idCodeGenerator = new IdCodeGenerator(255, "1");
  * idCodeGenerator.nextId();
@@ -113,7 +113,8 @@ public class Sequence {
         }
         long suffix = (workerId << workerIdShift) | seqNum;
         String datePrefix = DateUtils.formatDate(timestamp, DatePattern.YYMMDDHHMMSSSSS);
-        return new StringBuilder(25).append(datePrefix.substring(0, DatePattern.YYMMDDHHMMSS.length())).append(businessCode).append(suffix).append(datePrefix.substring(DatePattern.YYMMDDHHMMSS.length())).toString();}
+        return new StringBuilder(25).append(datePrefix.substring(0, DatePattern.YYMMDDHHMMSS.length())).append(businessCode).append(suffix).append(datePrefix.substring(DatePattern.YYMMDDHHMMSS.length())).toString();
+    }
 
     /**
      * 循环等待下一个时间

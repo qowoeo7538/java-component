@@ -1,4 +1,4 @@
-package org.lucas.component.common.core.date;
+package org.lucas.component.common.date;
 
 import cn.hutool.core.date.DateUtil;
 import org.joda.time.DateTime;

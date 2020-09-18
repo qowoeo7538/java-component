@@ -1,4 +1,4 @@
-package org.lucas.component.common.generator.idcenter;
+package org.lucas.component.common.core.idcenter;
 
 import org.lucas.component.common.enums.AppName;
 
