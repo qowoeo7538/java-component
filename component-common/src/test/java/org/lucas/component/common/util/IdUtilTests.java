@@ -8,6 +8,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.junit.jupiter.api.Test;
 import org.lucas.component.common.core.idcenter.CodeGenerator;
+import org.lucas.component.common.core.idcenter.SeqGenerator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,8 +42,14 @@ class IdUtilTests {
     }
 
     @Test
-    void testUidGenerator() {
+    void testCodeGenerator() {
         CodeGenerator sequence = new CodeGenerator(255, "1");
+        IntStream.range(1, 100).forEach(t -> System.out.println(sequence.nextId()));
+    }
+
+    @Test
+    void testEpochCodeGenerator() {
+        SeqGenerator sequence = new SeqGenerator(1);
         IntStream.range(1, 100).forEach(t -> System.out.println(sequence.nextId()));
     }
 

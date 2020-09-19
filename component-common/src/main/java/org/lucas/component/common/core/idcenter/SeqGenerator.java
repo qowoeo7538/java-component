@@ -6,17 +6,40 @@ import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Enumeration;
 
-public class SeqWorker {
+/**
+ * 编码构成： wokerId()-> 时间戳-> workerId(8 bit)-> 自增序列(11 bit)
+ */
+public class SeqGenerator {
 
-    private final static long twepoch = 1288834974657L;
+    /**
+     * 项目起始时间
+     */
+    private static final long TIME_EPOCH = 1463673600000L;
+
+    /**
+     * 初始化序列
+     */
     private long sequence = 0L;
-    private final static long sequenceBits = 10L;
 
-    private final static long timestampLeftShift = sequenceBits;
-    public final static long sequenceMask = -1L ^ -1L << sequenceBits;
+    /**
+     * 自增 bits
+     */
+    private static final long sequenceBits = 10L;
 
+    /**
+     * 自增序列最大值：1023
+     */
+    public static final long sequenceMask = ~(-1L << sequenceBits);
+
+    /**
+     * 时间戳偏移量
+     */
+    private static final long timestampLeftShift = sequenceBits;
+
+    /**
+     * 初始化时间差
+     */
     private long lastTimestamp = -1L;
-
 
     private static final int LOW_ORDER_THREE_BYTES = 0x00ffffff;
 
@@ -26,10 +49,19 @@ public class SeqWorker {
 
     private final String workerId;
 
+    static {
+        try {
+            MACHINE_IDENTIFIER = createMachineIdentifier();
+            PROCESS_IDENTIFIER = createProcessIdentifier();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public SeqWorker(int businessCode) {
+    public SeqGenerator(int businessCode) {
         long counter = MACHINE_IDENTIFIER;
         if (businessCode < 0) {
             throw new IllegalArgumentException("businessCode can't be less than 0");
@@ -42,29 +74,25 @@ public class SeqWorker {
         long timestamp;
         synchronized (this) {
             timestamp = this.timeGen();
-
-            if (this.lastTimestamp == timestamp) {
-                this.sequence = (this.sequence + 1) & SeqWorker.sequenceMask;
-                if (this.sequence == 0) {
-//                System.out.println("###########" + sequenceMask);
-                    timestamp = this.tilNextMillis(this.lastTimestamp);
-                }
-            } else {
-                this.sequence = 0;
-            }
             if (timestamp < this.lastTimestamp) {
                 throw new RuntimeException(
                         String.format(
                                 "Clock moved backwards.  Refusing to generate id for %d milliseconds",
                                 this.lastTimestamp - timestamp));
             }
-
+            if (this.lastTimestamp == timestamp) {
+                this.sequence = (this.sequence + 1) & SeqGenerator.sequenceMask;
+                if (this.sequence == 0) {
+                    timestamp = this.tilNextMillis(this.lastTimestamp);
+                }
+            } else {
+                this.sequence = 0;
+            }
             this.lastTimestamp = timestamp;
             seqNum = this.sequence;
         }
-
-        long nextId = (((timestamp - twepoch) << timestampLeftShift)) | (seqNum);
-        return new StringBuilder(32).append(workerId).append(nextId).toString();
+        long nextId = (((timestamp - TIME_EPOCH) << timestampLeftShift)) | (seqNum);
+        return workerId + nextId;
     }
 
     private long tilNextMillis(final long lastTimestamp) {
@@ -75,17 +103,11 @@ public class SeqWorker {
         return timestamp;
     }
 
+    /**
+     * @return 当前时间戳
+     */
     private long timeGen() {
         return System.currentTimeMillis();
-    }
-
-    static {
-        try {
-            MACHINE_IDENTIFIER = createMachineIdentifier();
-            PROCESS_IDENTIFIER = createProcessIdentifier();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static int createMachineIdentifier() {
