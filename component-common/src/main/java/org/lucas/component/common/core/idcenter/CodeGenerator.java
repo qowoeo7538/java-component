@@ -119,19 +119,23 @@ public class CodeGenerator {
     public String nextId() {
         long timestamp;
         long seqNum;
+        // 1 保证线程安全
         synchronized (this) {
             timestamp = genTime();
+            // 1.2 如果服务器时间有问题(时钟回拨) 报错。
             if (timestamp < lastTimestamp) {
-                // 如果服务器时间有问题(时钟回拨) 报错。
                 throw new IllegalStateException(StrUtil.format("Clock moved backwards. Refusing to generate id for {}ms", lastTimestamp - timestamp));
             }
+            // 1.3 如果当前时间和上一次是同一秒时间
             if (lastTimestamp == timestamp) {
+                // 1.3.1 sequence自增。
                 sequence = (sequence + 1) & sequenceMask;
-                // 如果 sequence 溢出则等待下一个时间。
+                // 1.3.2 如果 sequence 溢出则等待下一个时间。
                 if (sequence == 0) {
                     timestamp = tilNextMillis(lastTimestamp);
                 }
             } else {
+                // 1.4 如果是新的一秒，那么sequence重新从0开始
                 sequence = 0L;
             }
             seqNum = sequence;
