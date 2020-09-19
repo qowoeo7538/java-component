@@ -12,10 +12,10 @@ import java.net.UnknownHostException;
 
 /**
  * 与snowflake算法区别, 返回字符串id, 占用更多字节, 但直观从id中看出生成时间(主要用于订单号 、 流水号等生成)
+ * 编码构成： YYMMDDHHMMSS(年月日字符)-> businessCode(业务编码字符)-> workerId(8 bit)-> 自增序列(11 bit)-> SSS(毫秒字符)
  * <p>
  * 注：如果有多个IP的后三位都一样，有可能会产生一样记录
  * <p>
- * 参考：https://github.com/baidu/uid-generator
  * 用法：建议只生成一次当前实例
  * IdCodeGenerator idCodeGenerator = new IdCodeGenerator(255, "1");
  * idCodeGenerator.nextId();
@@ -24,7 +24,7 @@ import java.net.UnknownHostException;
 public class CodeGenerator {
 
     /**
-     * ip（三位IP）
+     * workerId（默认为后三位IP地址）
      */
     private final long workerId;
     /**
@@ -33,32 +33,55 @@ public class CodeGenerator {
     private final String businessCode;
 
     /**
-     * 自增序列
+     * IP
+     */
+    private static final int IP;
+
+    /**
+     * 初始自增序列
      */
     private long sequence = 0L;
 
     /**
-     * 最后三位ip（最大为255）
+     * workerId bits 最后三位ip（最大为255）
      */
     private final long workerIdBits = 8L;
-    private final long maxWorkerId = ~(-1L << workerIdBits);
+
+    /**
+     * 自增 bits
+     */
     private final long sequenceBits = 11L;
 
-    private long workerIdShift = sequenceBits;
 
+    /**
+     * workerId 最大值为255
+     */
+    private final long maxWorkerId = ~(-1L << workerIdBits);
 
+    /**
+     * 自增序列最大值为 2047
+     */
     private final long sequenceMask = ~(-1L << sequenceBits);
 
+    /**
+     * workerId 偏移量
+     */
+    private long workerIdShift = sequenceBits;
+
+    /**
+     * 是否使用系统时间
+     */
     private final boolean useSystemClock;
 
+    /**
+     * 最后生成时间
+     */
     private volatile long lastTimestamp = genTime();
-
-    private static int ip;
 
     static {
         try {
             String ipStr = NetUtils.getLocalIp().substring(NetUtils.getLocalIp().length() - 3, NetUtils.getLocalIp().length());
-            ip = Integer.parseInt(ipStr);
+            IP = Integer.parseInt(ipStr);
         } catch (final SocketException | UnknownHostException e) {
             throw new IllegalArgumentException("");
         }
@@ -68,7 +91,7 @@ public class CodeGenerator {
      * @param businessCode 业务编码号 如：0、1、2
      */
     public CodeGenerator(String businessCode) {
-        this(ip, businessCode, false);
+        this(IP, businessCode, false);
     }
 
     /**
@@ -116,7 +139,9 @@ public class CodeGenerator {
         }
         long suffix = (workerId << workerIdShift) | seqNum;
         String datePrefix = DateUtils.formatDate(timestamp, DatePattern.YYMMDDHHMMSSSSS);
-        return new StringBuilder(25).append(datePrefix.substring(0, DatePattern.YYMMDDHHMMSS.length())).append(businessCode).append(suffix).append(datePrefix.substring(DatePattern.YYMMDDHHMMSS.length())).toString();
+
+        return datePrefix.substring(0, DatePattern.YYMMDDHHMMSS.length()) + businessCode + suffix
+                + datePrefix.substring(DatePattern.YYMMDDHHMMSS.length());
     }
 
     /**

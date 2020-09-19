@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
-public class IdUtilTests {
+class IdUtilTests {
 
     /**
      * 获取当前机器编码
      */
     @Test
-    public void TestWorkerId() {
+    void testWorkerId() {
         try {
             long workerId = NetUtil.ipv4ToLong(NetUtil.getLocalhostStr());
             System.out.println("当前机器 workerId:" + workerId);
@@ -36,21 +36,21 @@ public class IdUtilTests {
      * 数据库使用 char(25) 存储
      */
     @Test
-    public void testBatchId() {
+    void testBatchId() {
         IntStream.range(1, 10).forEach(i -> System.out.println(batchId(10000, 10)));
     }
 
     @Test
-    public void testUidGenerator() {
+    void testUidGenerator() {
         CodeGenerator sequence = new CodeGenerator(255, "1");
-        IntStream.range(1, 10).forEach(t -> System.out.println(sequence.nextId()));
+        IntStream.range(1, 100).forEach(t -> System.out.println(sequence.nextId()));
     }
 
     /**
      * 生成的是不带-的字符串，类似于：b17f24ff026d40949c85a24f4f375d42
      */
     @Test
-    public void testSimpleUUID() {
+    void testSimpleUUID() {
         IntStream.range(1, 10).forEach(i -> System.out.println(IdUtil.simpleUUID()));
     }
 
@@ -58,7 +58,7 @@ public class IdUtilTests {
      * 生成的UUID是带-的字符串，类似于：a5c8a5e8-df2b-4706-bea4-08d0939410e3
      */
     @Test
-    public void testRandomUUID() {
+    void testRandomUUID() {
         IntStream.range(1, 10).forEach(i -> System.out.println(IdUtil.randomUUID()));
     }
 
@@ -66,7 +66,7 @@ public class IdUtilTests {
      * 生成 Snowflake
      */
     @Test
-    public void testSnowflake() {
+    void testSnowflake() {
         final long workerId = 0L;
         Snowflake snowflake = IdUtil.createSnowflake(workerId, 1);
         IntStream.range(1, 10).forEach(i -> System.out.println(snowflake.nextId()));
@@ -79,7 +79,7 @@ public class IdUtilTests {
      * 是 UUID version1 的变种，详细介绍可见：服务化框架－分布式 Unique ID 的生成方法一览。
      */
     @Test
-    public void testObjectId() {
+    void testObjectId() {
         IntStream.range(1, 10).forEach(i -> System.out.println(ObjectId.next()));
     }
 
