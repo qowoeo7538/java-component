@@ -45,28 +45,28 @@ public class CodeGenerator {
     /**
      * workerId bits 最后三位ip（最大为255）
      */
-    private final long workerIdBits = 8L;
+    private static final long WORKER_ID_BITS = 8L;
 
     /**
      * 自增 bits
      */
-    private final long sequenceBits = 11L;
+    private static final long SEQUENCE_BITS = 11L;
 
 
     /**
      * workerId 最大值为255
      */
-    private final long maxWorkerId = ~(-1L << workerIdBits);
+    private static final long MAX_WORKER_ID = ~(-1L << WORKER_ID_BITS);
 
     /**
      * 自增序列最大值为 2047
      */
-    private final long sequenceMask = ~(-1L << sequenceBits);
+    private static final long MAX_SEQUENCE = ~(-1L << SEQUENCE_BITS);
 
     /**
      * workerId 偏移量
      */
-    private long workerIdShift = sequenceBits;
+    private static long WORKER_ID_SHIFT = SEQUENCE_BITS;
 
     /**
      * 是否使用系统时间
@@ -105,8 +105,8 @@ public class CodeGenerator {
      * @param businessCode 业务编码号 如：0、1、2
      */
     public CodeGenerator(long workerId, String businessCode, boolean useSystemClock) {
-        if (workerId > maxWorkerId || workerId < 0) {
-            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
+        if (workerId > MAX_WORKER_ID || workerId < 0) {
+            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
         }
         if (StringUtils.isEmpty(businessCode)) {
             throw new IllegalArgumentException("businessCode can't be empty");
@@ -129,7 +129,7 @@ public class CodeGenerator {
             // 1.3 如果当前时间和上一次是同一秒时间
             if (lastTimestamp == timestamp) {
                 // 1.3.1 sequence自增。
-                sequence = (sequence + 1) & sequenceMask;
+                sequence = (sequence + 1) & MAX_SEQUENCE;
                 // 1.3.2 如果 sequence 溢出则等待下一个时间。
                 if (sequence == 0) {
                     timestamp = tilNextMillis(lastTimestamp);
@@ -141,7 +141,7 @@ public class CodeGenerator {
             seqNum = sequence;
             lastTimestamp = timestamp;
         }
-        long suffix = (workerId << workerIdShift) | seqNum;
+        long suffix = (workerId << WORKER_ID_SHIFT) | seqNum;
         String datePrefix = DateUtils.formatDate(timestamp, DatePattern.YYMMDDHHMMSSSSS);
 
         return datePrefix.substring(0, DatePattern.YYMMDDHHMMSS.length()) + businessCode + suffix
