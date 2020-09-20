@@ -21,7 +21,7 @@ import java.net.UnknownHostException;
  * idCodeGenerator.nextId();
  * idCodeGenerator.nextId();
  */
-public class CodeGenerator {
+public class UidGenerator {
 
     /**
      * workerId（默认为后三位IP地址）
@@ -90,21 +90,21 @@ public class CodeGenerator {
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public CodeGenerator(String businessCode) {
+    public UidGenerator(String businessCode) {
         this(IP, businessCode, false);
     }
 
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public CodeGenerator(long workerId, String businessCode) {
+    public UidGenerator(long workerId, String businessCode) {
         this(workerId, businessCode, false);
     }
 
     /**
      * @param businessCode 业务编码号 如：0、1、2
      */
-    public CodeGenerator(long workerId, String businessCode, boolean useSystemClock) {
+    public UidGenerator(long workerId, String businessCode, boolean useSystemClock) {
         if (workerId > MAX_WORKER_ID || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
         }
