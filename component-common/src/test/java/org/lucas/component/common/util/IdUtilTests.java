@@ -7,8 +7,13 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.junit.jupiter.api.Test;
-import org.lucas.component.common.core.idcenter.CodeGenerator;
+import org.lucas.component.common.core.idcenter.DefaultUidGenerator;
 import org.lucas.component.common.core.idcenter.SeqGenerator;
+import org.lucas.component.common.core.idcenter.UidGenerator;
+import org.lucas.component.common.core.idcenter.support.BitsAllocator;
+import org.lucas.component.common.core.idcenter.support.time.SecondsGenerator;
+import org.lucas.component.common.core.idcenter.support.time.TimeGenerator;
+import org.lucas.component.common.core.idcenter.support.worker.WorkerIdAssigner;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,8 +48,16 @@ class IdUtilTests {
 
     @Test
     void testCodeGenerator() {
-        CodeGenerator sequence = new CodeGenerator(255, "1");
+        UidGenerator sequence = new UidGenerator(255, "1");
         IntStream.range(1, 100).forEach(t -> System.out.println(sequence.nextId()));
+    }
+
+    @Test
+    void testDefaultUidGenerator() {
+        WorkerIdAssigner workerIdAssigner = () -> 1;
+        TimeGenerator timeGenerator = new SecondsGenerator();
+        DefaultUidGenerator generator = new DefaultUidGenerator(BitsAllocator.UID, workerIdAssigner, timeGenerator);
+        IntStream.range(1, 100).forEach(t -> System.out.println(generator.getUID()));
     }
 
     @Test

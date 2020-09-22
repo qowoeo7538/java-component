@@ -4,6 +4,14 @@ import org.springframework.util.Assert;
 
 public enum BitsAllocator {
 
+    /**
+     * TimeGenerator:{@link org.lucas.component.common.core.idcenter.support.time.MillisecondsGenerator}
+     */
+    SNOWFLAKE(41, 10, 12),
+
+    /**
+     * TimeGenerator:{@link org.lucas.component.common.core.idcenter.support.time.SecondsGenerator}
+     */
     UID(28, 22, 13);
 
     /**
@@ -11,7 +19,7 @@ public enum BitsAllocator {
      * Bits for [sign-> second-> workId-> sequence]
      * [标示位-> 时间戳-> workId-> 自增序列]
      */
-    private static final int TOTAL_BITS = 1 << 6;
+    public static final int TOTAL_BITS = 1 << 6;
     private int signBits = 1;
     private final int timestampBits;
     private final int workerIdBits;
