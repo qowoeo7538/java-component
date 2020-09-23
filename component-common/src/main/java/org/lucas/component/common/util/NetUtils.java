@@ -70,9 +70,9 @@ public abstract class NetUtils {
         if (!StringUtils.isEmpty(localHostAddress)) {
             return localHostAddress;
         }
-        String ip = "";
+        String ip;
         String ipBak = "";
-        InetAddress inetAddress = null;
+        InetAddress inetAddress;
         inetAddress = InetAddress.getLocalHost();
         ip = inetAddress.getHostAddress();
         if (!StringUtils.isEmpty(ip) && !LOCAL_HOST.equals(ip) && ip.indexOf(':') < 0) {

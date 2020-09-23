@@ -23,7 +23,7 @@ public abstract class StringHelper {
                 if (buf == null) {
                     buf = new StringBuilder();
                     if (i > 0) {
-                        buf.append(camelName.substring(0, i));
+                        buf.append(camelName, 0, i);
                     }
                 }
                 if (i > 0) {

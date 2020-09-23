@@ -86,6 +86,7 @@ configure(moduleProjects) { subproject ->
         google_guava_version = "28.2-jre"
         joda_time_version = "2.10.5"
         cn_hutool_version = "5.4.0"
+        commons_lang3_version = "3.11"
     }
 
     [compileJava, compileTestJava].each() {
@@ -105,6 +106,7 @@ configure(moduleProjects) { subproject ->
     }
 
     dependencies {
+        compile("org.apache.commons:commons-lang3:${commons_lang3_version}")
         compile("org.eclipse.collections:eclipse-collections-api:${collections_version}")
         compile("org.eclipse.collections:eclipse-collections:${collections_version}")
         testCompile("org.junit.jupiter:junit-jupiter-api:${unit_jupiter_version}") {

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DefaultUidGenerator {
 
-    private TimeGenerator timeGenerator;
+    protected TimeGenerator timeGenerator;
 
     protected BitsAllocator bitsAllocator;
 
@@ -61,7 +61,7 @@ public class DefaultUidGenerator {
         long workerId = (uid << (timestampBits + signBits)) >>> (totalBits - workerIdBits);
         long deltaSeconds = uid >>> (workerIdBits + sequenceBits);
 
-        Date thatTime = new Date(TimeUnit.SECONDS.toMillis(timeGenerator.getThatTime(deltaSeconds)));
+        Date thatTime = new Date(TimeUnit.SECONDS.toMillis(timeGenerator.getEpochTime() + deltaSeconds));
         String thatTimeStr = DateUtil.formatDateTime(thatTime);
 
         // format as string
@@ -97,7 +97,7 @@ public class DefaultUidGenerator {
         lastTime = currentTime;
 
         // 4 Allocate bits for UID
-        return bitsAllocator.allocate(timeGenerator.getDeltaTime(currentTime), workerId, sequence);
+        return bitsAllocator.allocate(currentTime - timeGenerator.getEpochTime(), workerId, sequence);
     }
 
     /**

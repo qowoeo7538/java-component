@@ -7,6 +7,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.junit.jupiter.api.Test;
+import org.lucas.component.common.core.idcenter.CacheUidGenerator;
 import org.lucas.component.common.core.idcenter.DefaultUidGenerator;
 import org.lucas.component.common.core.idcenter.SeqGenerator;
 import org.lucas.component.common.core.idcenter.UidGenerator;
@@ -57,6 +58,13 @@ class IdUtilTests {
         WorkerIdAssigner workerIdAssigner = () -> 1;
         TimeGenerator timeGenerator = new SecondsGenerator();
         DefaultUidGenerator generator = new DefaultUidGenerator(BitsAllocator.UID, workerIdAssigner, timeGenerator);
+        IntStream.range(1, 100).forEach(t -> System.out.println(generator.getUID()));
+    }
+
+    @Test
+    void testCacheUidGenerator() {
+        WorkerIdAssigner workerIdAssigner = () -> 1;
+        CacheUidGenerator generator = new CacheUidGenerator(workerIdAssigner);
         IntStream.range(1, 100).forEach(t -> System.out.println(generator.getUID()));
     }
 

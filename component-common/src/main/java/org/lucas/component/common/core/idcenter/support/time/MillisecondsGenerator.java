@@ -24,12 +24,7 @@ public class MillisecondsGenerator implements TimeGenerator {
     }
 
     @Override
-    public long getDeltaTime(long currentTime) {
-        return currentTime - epochMilliseconds;
-    }
-
-    @Override
-    public long getThatTime(long deltaTime) {
-        return epochMilliseconds + deltaTime;
+    public long getEpochTime() {
+        return epochMilliseconds;
     }
 }

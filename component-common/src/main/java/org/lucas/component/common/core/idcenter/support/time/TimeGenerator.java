@@ -7,7 +7,5 @@ public interface TimeGenerator {
      */
     long genCurrentTime(long maxDeltaTime);
 
-    long getDeltaTime(long currentTime);
-
-    long getThatTime(long deltaTime);
+    long getEpochTime();
 }

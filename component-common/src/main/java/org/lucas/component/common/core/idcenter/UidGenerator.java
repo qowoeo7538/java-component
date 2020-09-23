@@ -66,7 +66,7 @@ public class UidGenerator {
     /**
      * workerId 偏移量
      */
-    private static long WORKER_ID_SHIFT = SEQUENCE_BITS;
+    private static final long WORKER_ID_SHIFT = SEQUENCE_BITS;
 
     /**
      * 是否使用系统时间

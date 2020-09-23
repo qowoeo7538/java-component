@@ -25,12 +25,7 @@ public class SecondsGenerator implements TimeGenerator {
     }
 
     @Override
-    public long getDeltaTime(long currentTime) {
-        return currentTime - epochSeconds;
-    }
-
-    @Override
-    public long getThatTime(long deltaTime) {
-        return epochSeconds + deltaTime;
+    public long getEpochTime() {
+        return epochSeconds;
     }
 }
