@@ -36,11 +36,13 @@ public class RingBuffer {
 
     /**
      * Tail: last position sequence to produce
+     * 最后一个生成的唯一ID位置。
      */
     private final AtomicLong tail = new PaddedAtomicLong(START_POINT);
 
     /**
      * Cursor: current position sequence to consume
+     * 最后一个已经给消费的唯一ID
      */
     private final AtomicLong cursor = new PaddedAtomicLong(START_POINT);
 
@@ -64,6 +66,12 @@ public class RingBuffer {
         this(bufferSize, DEFAULT_PADDING_PERCENT);
     }
 
+    /**
+     * @param bufferSize
+     * @param paddingFactor 默认paddingFactor为50。这个值的意思是当RingBuffer中剩余可用ID数量少于50%的时候，就会
+     *                      触发一个异步线程往RingBuffer中填充新的唯一ID（调用BufferPaddingExecutor中
+     *                      的paddingBuffer()方法，这个线程中会有一个标志位running控制并发问题），直到填满为止；
+     */
     public RingBuffer(int bufferSize, int paddingFactor) {
         // check buffer size is positive & a power of 2; padding factor in (0, 100)
         Assert.isTrue(bufferSize > 0L, "RingBuffer size must be positive");

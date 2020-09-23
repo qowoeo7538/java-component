@@ -114,6 +114,8 @@ public class BufferPaddingExecutor {
         // fill the rest slots until to catch the cursor
         boolean isFullRingBuffer = false;
         while (!isFullRingBuffer) {
+            // 通过incrementAndGet()方法获取下一次的时间，从而脱离了对服务器时间的依赖，也就不会有时钟回拨的问
+            // 题（这种做法也有一个小问题，即分布式ID中的时间信息可能并不是这个ID真正产生的时间点
             List<Long> uidList = uidProvider.provide(lastSecond.incrementAndGet());
             for (Long uid : uidList) {
                 isFullRingBuffer = !ringBuffer.put(uid);
