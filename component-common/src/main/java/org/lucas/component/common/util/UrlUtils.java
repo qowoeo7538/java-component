@@ -2,7 +2,6 @@ package org.lucas.component.common.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
