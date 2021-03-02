@@ -19,8 +19,7 @@ public abstract class UrlUtils {
     public static <T> String getParamsString(final Map<String, T> params, final String enc)
             throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
-        for (Iterator<Map.Entry<String, T>> iterator = params.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, T> entry = iterator.next();
+        for (Map.Entry<String, T> entry : params.entrySet()) {
             result.append(URLEncoder.encode(entry.getKey(), enc));
             result.append("=");
             result.append(URLEncoder.encode(entry.getValue().toString(), enc));
