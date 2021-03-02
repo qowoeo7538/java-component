@@ -1,7 +1,8 @@
 package org.lucas.component.common.util;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -10,13 +11,11 @@ import java.util.Map;
  */
 public abstract class UrlUtils {
 
-    public static <T> String getParamsString(final Map<String, T> params)
-            throws UnsupportedEncodingException {
-        return getParamsString(params, "UTF-8");
+    public static <T> String getParamsString(final Map<String, T> params) {
+        return getParamsString(params, StandardCharsets.UTF_8);
     }
 
-    public static <T> String getParamsString(final Map<String, T> params, final String enc)
-            throws UnsupportedEncodingException {
+    public static <T> String getParamsString(final Map<String, T> params, final Charset enc) {
         StringBuilder result = new StringBuilder();
         for (Map.Entry<String, T> entry : params.entrySet()) {
             result.append(URLEncoder.encode(entry.getKey(), enc));
