@@ -17,7 +17,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E>, Seri
 
     private static final Object PRESENT = new Object();
 
-    private final ConcurrentMap<E, Object> map;
+    private final transient ConcurrentMap<E, Object> map;
 
     public ConcurrentHashSet() {
         map = new ConcurrentHashMap<>();
