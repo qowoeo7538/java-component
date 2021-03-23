@@ -10,10 +10,10 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Compress_Tests {
+class Compress_Tests {
 
     @Test
-    public void testSnappyCompress() throws IOException {
+    void testSnappyCompress() throws IOException {
         List<Student> students = new ArrayList<>();
         for (int i = 0, length = 10000000; i < length; i++) {
             Student student = new Student("id4300", "张三", i);

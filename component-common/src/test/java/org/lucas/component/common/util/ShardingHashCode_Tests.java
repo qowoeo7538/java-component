@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
-public class ShardingHashCode_Tests {
+class ShardingHashCode_Tests {
 
     @Test
-    public void testHashFor() {
+    void testHashFor() {
         ShardingHashCode hashCoding = new ShardingHashCode(32, 64);
         int count = 100000;
         Map<String, LongAdder> map = new HashMap<>();

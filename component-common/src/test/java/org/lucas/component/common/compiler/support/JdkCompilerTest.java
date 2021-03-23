@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-public class JdkCompilerTest extends JavaCodeTest {
+class JdkCompilerTest extends JavaCodeTest {
 
     @Test
-    public void test_compileJavaClass() throws Exception {
+    void test_compileJavaClass() throws Exception {
         JdkCompiler compiler = new JdkCompiler();
         Class<?> clazz = compiler.compile(getSimpleCode(), JdkCompiler.class.getClassLoader());
         Object instance = clazz.newInstance();
@@ -17,7 +17,7 @@ public class JdkCompilerTest extends JavaCodeTest {
     }
 
     @Test
-    public void test_compileJavaClass0() throws Exception {
+    void test_compileJavaClass0() throws Exception {
         Assertions.assertThrows(IllegalStateException.class, () -> {
             JdkCompiler compiler = new JdkCompiler();
             Class<?> clazz = compiler.compile(getSimpleCodeWithoutPackage(), JdkCompiler.class.getClassLoader());
@@ -28,7 +28,7 @@ public class JdkCompilerTest extends JavaCodeTest {
     }
 
     @Test
-    public void test_compileJavaClass1() throws Exception {
+    void test_compileJavaClass1() throws Exception {
         Assertions.assertThrows(IllegalStateException.class, () -> {
             JdkCompiler compiler = new JdkCompiler();
             Class<?> clazz = compiler.compile(getSimpleCodeWithSyntax(), JdkCompiler.class.getClassLoader());

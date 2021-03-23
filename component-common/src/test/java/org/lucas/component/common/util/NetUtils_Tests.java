@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-public class NetUtils_Tests {
+class NetUtils_Tests {
 
     @Test
-    public void testGetIpCode() throws Exception {
+    void testGetIpCode() throws Exception {
         String ip = NetUtils.getLocalIp();
         System.out.println(ip);
         Assertions.assertNotNull(Objects.equals(NetUtils.getLocalIp(), ip));

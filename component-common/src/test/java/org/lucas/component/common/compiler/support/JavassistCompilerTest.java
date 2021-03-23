@@ -21,9 +21,9 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-public class JavassistCompilerTest extends JavaCodeTest {
+class JavassistCompilerTest extends JavaCodeTest {
     @Test
-    public void testCompileJavaClass() throws Exception {
+    void testCompileJavaClass() throws Exception {
         JavassistCompiler compiler = new JavassistCompiler();
         Class<?> clazz = compiler.compile(getSimpleCode(), JavassistCompiler.class.getClassLoader());
 
@@ -37,7 +37,7 @@ public class JavassistCompilerTest extends JavaCodeTest {
      * javassist compile will find HelloService in classpath
      */
     @Test
-    public void testCompileJavaClass0() throws Exception {
+    void testCompileJavaClass0() throws Exception {
         JavassistCompiler compiler = new JavassistCompiler();
         Class<?> clazz = compiler.compile(getSimpleCodeWithoutPackage(), JavassistCompiler.class.getClassLoader());
         Object instance = clazz.newInstance();
@@ -46,7 +46,7 @@ public class JavassistCompilerTest extends JavaCodeTest {
     }
 
     @Test
-    public void testCompileJavaClass1() throws Exception {
+    void testCompileJavaClass1() throws Exception {
         Assertions.assertThrows(IllegalStateException.class, () -> {
             JavassistCompiler compiler = new JavassistCompiler();
             Class<?> clazz = compiler.compile(getSimpleCodeWithSyntax0(), JavassistCompiler.class.getClassLoader());
@@ -57,7 +57,7 @@ public class JavassistCompilerTest extends JavaCodeTest {
     }
 
     @Test
-    public void testCompileJavaClassWithImport() throws Exception {
+    void testCompileJavaClassWithImport() throws Exception {
         JavassistCompiler compiler = new JavassistCompiler();
         Class<?> clazz = compiler.compile(getSimpleCodeWithImports(), JavassistCompiler.class.getClassLoader());
         Object instance = clazz.newInstance();
@@ -66,7 +66,7 @@ public class JavassistCompilerTest extends JavaCodeTest {
     }
 
     @Test
-    public void testCompileJavaClassWithExtends() throws Exception {
+    void testCompileJavaClassWithExtends() throws Exception {
         JavassistCompiler compiler = new JavassistCompiler();
         Class<?> clazz = compiler.compile(getSimpleCodeWithWithExtends(), JavassistCompiler.class.getClassLoader());
         Object instance = clazz.newInstance();
