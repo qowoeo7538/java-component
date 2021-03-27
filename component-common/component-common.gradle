@@ -15,4 +15,5 @@ dependencies {
     compile("cn.hutool:hutool-core:${cn_hutool_version}")
     compile("io.netty:netty-all:${netty_version}")
     compile("io.vavr:vavr:${vavr_version}")
+    compile("de.mkammerer:argon2-jvm:${argon2_version}")
 }

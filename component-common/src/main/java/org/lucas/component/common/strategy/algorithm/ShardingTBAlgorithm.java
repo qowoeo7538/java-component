@@ -1,6 +1,6 @@
 package org.lucas.component.common.strategy.algorithm;
 
-import org.lucas.component.common.hash.ShardingHashCode;
+import org.lucas.component.common.hash.sharding.ShardingHashCode;
 import org.springframework.util.StringUtils;
 
 public class ShardingTBAlgorithm {

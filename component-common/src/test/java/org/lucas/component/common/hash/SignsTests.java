@@ -2,6 +2,7 @@ package org.lucas.component.common.hash;
 
 import com.google.common.base.Charsets;
 import org.junit.jupiter.api.Test;
+import org.lucas.component.common.hash.content.Signs;
 
 class SignsTests {
 

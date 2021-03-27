@@ -1,4 +1,4 @@
-package org.lucas.component.common.hash;
+package org.lucas.component.common.hash.sharding;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;

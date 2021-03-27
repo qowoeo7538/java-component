@@ -1,4 +1,4 @@
-package org.lucas.component.common.hash;
+package org.lucas.component.common.hash.content;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;

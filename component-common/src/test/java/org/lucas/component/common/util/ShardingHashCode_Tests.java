@@ -1,7 +1,7 @@
 package org.lucas.component.common.util;
 
 import org.junit.jupiter.api.Test;
-import org.lucas.component.common.hash.ShardingHashCode;
+import org.lucas.component.common.hash.sharding.ShardingHashCode;
 
 import java.util.HashMap;
 import java.util.Map;
