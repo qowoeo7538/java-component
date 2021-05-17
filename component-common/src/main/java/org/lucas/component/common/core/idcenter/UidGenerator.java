@@ -80,7 +80,7 @@ public class UidGenerator {
 
     static {
         try {
-            String ipStr = NetUtils.getLocalIp().substring(NetUtils.getLocalIp().length() - 3, NetUtils.getLocalIp().length());
+            String ipStr = NetUtils.getLocalIp().substring(NetUtils.getLocalIp().length() - 3);
             IP = Integer.parseInt(ipStr);
         } catch (final SocketException | UnknownHostException e) {
             throw new IllegalArgumentException("");
