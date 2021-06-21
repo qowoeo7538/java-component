@@ -118,7 +118,7 @@ public class ThreadPoolTaskExecutor extends AbstractExecutorService {
     }
 
     public ThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int keepAliveSeconds, final int queueCapacity, final ThreadFactory threadFactory, final RejectedExecutionHandler rejectedExecutionHandler) {
-        this.threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize > corePoolSize ? maxPoolSize : corePoolSize,
+        this.threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, Math.max(maxPoolSize, corePoolSize),
                 keepAliveSeconds, TimeUnit.SECONDS, new ExecutorQueue(), threadFactory, rejectedExecutionHandler) {
             @Override
             protected void beforeExecute(final Thread t, final Runnable r) {
